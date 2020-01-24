@@ -1,0 +1,2 @@
+# konane
+Play Konane
