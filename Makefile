@@ -8,7 +8,9 @@
 TARGET = konane
 
 STD = -std=c11
-WARNINGS = -Wall -Wextra -Wpedantic
+CC = clang
+WARNINGS = -Weverything -Wno-gnu-empty-initializer
+#WARNINGS = -Wall -Wextra -Wpedantic
 OPTS = -O3 -march=native -flto
 CFLAGS = $(STD) $(WARNINGS) $(OPTS)
 #LDLIBS = -lpthread
