@@ -10,6 +10,47 @@ typedef enum {
 } State;
 
 #define SIZE	4
+#define WHITE_CIRCLE "○"
+#define BLACK_CIRCLE "●"
+
+
+static void initBoard(State board[SIZE][SIZE]){
+	for(int i = 0; i < SIZE; i++){
+		for(int j = 0; j < SIZE; j = j+2){
+			if(i%2 == 0){
+				board[i][j] = BLACK;
+				board[i][j+1] = WHITE;
+			}
+			else{
+				board[i][j] = WHITE;
+				board[i][j+1] = BLACK;
+			}
+		}
+	}
+}
+
+static void printBoard(const State board[SIZE][SIZE]){
+	for(int i = 0; i < SIZE; i++){
+		for(int j = 0; j < SIZE; j++){
+            switch(board[i][j]){
+                case BLACK:
+                    printf(" %s", BLACK_CIRCLE); break;
+                case WHITE:
+                    printf(" %s", WHITE_CIRCLE); break;
+                case EMPTY:
+                    printf(" "); break;
+            }
+        }
+        printf("\n");
+    }
+}
+
+int main(void){
+	State board[SIZE][SIZE];
+	initBoard(board);
+	printBoard(board);
+return 1;
+}
 
 static void evaluate_board(const State board[SIZE][SIZE], uint32_t* black, uint32_t* white) {
 
@@ -61,13 +102,4 @@ static void evaluate_board(const State board[SIZE][SIZE], uint32_t* black, uint3
 
     *black = sum[BLACK];
     *white = sum[WHITE];
-}
-
-#define WHITE_CIRCLE "○"
-#define BLACK_CIRCLE "●"
-
-int main(void) {
-
-    State board[SIZE][SIZE];
-    puts("Konane!");
 }
