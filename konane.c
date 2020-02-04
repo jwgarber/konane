@@ -48,8 +48,17 @@ static void initBoard(State board[SIZE][SIZE]){
 }
 
 static void printBoard(const State board[SIZE][SIZE]){
-	for(int i = 0; i < SIZE; i++){
-		for(int j = 0; j < SIZE; j++){
+    printf("  ");
+    for(int i = 'a'; i < 'a' + SIZE; i++){
+        printf(" %c", i);
+    }
+    printf("\n");
+    for(int i = 0; i < SIZE; i++){
+		printf("%d", i+1);
+        if(i < 9){
+            printf(" ");
+        }
+        for(int j = 0; j < SIZE; j++){
             switch(board[i][j]){
                 case BLACK:
                     printf(" %s", BLACK_CIRCLE); break;
@@ -60,6 +69,7 @@ static void printBoard(const State board[SIZE][SIZE]){
             }
         }
         printf("\n");
+
     }
 }
 
@@ -67,6 +77,11 @@ int main(void){
 	State board[SIZE][SIZE];
 	initBoard(board);
 	printBoard(board);
+
+    printf("\nDo you want to play black or white?\n");
+    char user;
+    scanf("%c", &user);
+
     return 1;
 }
 
