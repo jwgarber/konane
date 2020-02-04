@@ -7,6 +7,7 @@
 #define WHITE_CIRCLE "○"
 #define BLACK_CIRCLE "●"
 
+#if 0
 State board41[SIZE][SIZE] = {{EMPTY, EMPTY, BLACK, WHITE},
                             {WHITE, BLACK, WHITE, BLACK},
                             {BLACK, WHITE, BLACK, WHITE},
@@ -30,7 +31,7 @@ State board62[SIZE][SIZE] = {{BLACK, WHITE, BLACK, WHITE, BLACK, WHITE},
                              {WHITE, BLACK, WHITE, BLACK, WHITE, BLACK},
                              {BLACK, WHITE, BLACK, WHITE, BLACK, WHITE},
                              {WHITE, BLACK, WHITE, BLACK, WHITE, BLACK}};
-
+#endif
 
 static void initBoard(State board[SIZE][SIZE]){
 	for(int i = 0; i < SIZE; i++){
@@ -54,8 +55,8 @@ static void printBoard(const State board[SIZE][SIZE]){
     }
     printf("\n");
     for(int i = 0; i < SIZE; i++){
-		printf("%d", i+1);
-        if(i < 9){
+		printf("%d", i);
+        if(i < 8){
             printf(" ");
         }
         for(int j = 0; j < SIZE; j++){
@@ -73,15 +74,39 @@ static void printBoard(const State board[SIZE][SIZE]){
     }
 }
 
+static State getUser(void){
+    printf("\nDo you want to play black or white? (b/w)\n");
+    char user;
+    scanf("%s", &user);
+    //error handle various entries
+    if(user == 'b'){
+        return BLACK;
+    }
+    if(user == 'w'){
+        return WHITE;
+    }
+    else{
+        printf("Invalid entry\n");
+        return EMPTY;
+    }
+}
+
 int main(void){
 	State board[SIZE][SIZE];
 	initBoard(board);
 	printBoard(board);
+    State user = getUser();
 
-    printf("\nDo you want to play black or white?\n");
-    char user;
-    scanf("%c", &user);
+    if(user == BLACK){
+        printf("\nRemove one: ");
+        int curr_row, next_row;
+        char curr_col, next_col;
+        scanf("%c%d", &curr_col, &curr_row);
+        printf("row = %d, col = %c", curr_row, curr_col);
+
+//        board[curr_row][1] = EMPTY;
+    }
+    printBoard(board);
 
     return 1;
 }
-
