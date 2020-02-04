@@ -1,8 +1,5 @@
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
-
-#include "konane.h"
 
 #define WIN      (SIZE * SIZE)
 #define LOOSE    (-SIZE * SIZE)
@@ -22,7 +19,7 @@ static void board_copy(State dst[SIZE][SIZE], const State src[SIZE][SIZE]) {
 // as the values for winning and loosing.
 static void count_moves(const State board[SIZE][SIZE], uint32_t* black, uint32_t* white) {
 
-    uint8_t newboard[2][SIZE][SIZE] = {};
+    uint8_t tmpboard[2][SIZE][SIZE] = {};
 
     for (size_t i = 0; i < SIZE; ++i) {
         for (size_t j = 0; j < SIZE; ++j) {
@@ -33,28 +30,28 @@ static void count_moves(const State board[SIZE][SIZE], uint32_t* black, uint32_t
             // Search up
             for (size_t k = i; k >= 2; k -= 2) {
                 if (board[k - 1][j] == !player && board[k - 2][j] == EMPTY) {
-                    newboard[player][k - 2][j] = 1;
+                    tmpboard[player][k - 2][j] = 1;
                 } else break;
             }
 
             // Search right
             for (size_t k = j; k < SIZE - 2; k += 2) {
                 if (board[i][k + 1] == !player && board[i][k + 2] == EMPTY) {
-                    newboard[player][i][k + 2] = 1;
+                    tmpboard[player][i][k + 2] = 1;
                 } else break;
             }
 
             // Search left
             for (size_t k = j; k >= 2; k -= 2) {
                 if (board[i][k - 1] == !player && board[i][k - 2] == EMPTY) {
-                    newboard[player][i][k - 2] = 1;
+                    tmpboard[player][i][k - 2] = 1;
                 } else break;
             }
 
             // Search down
             for (size_t k = i; k < SIZE - 2; k += 2) {
                 if (board[k + 1][j] == !player && board[k + 2][j] == EMPTY) {
-                    newboard[player][k + 2][j] = 1;
+                    tmpboard[player][k + 2][j] = 1;
                 } else break;
             }
         }
@@ -63,8 +60,8 @@ static void count_moves(const State board[SIZE][SIZE], uint32_t* black, uint32_t
     uint32_t sum[2] = {0, 0};
     for (size_t i = 0; i < SIZE; ++i) {
         for (size_t j = 0; j < SIZE; ++j) {
-            sum[0] += newboard[0][i][j];
-            sum[1] += newboard[1][i][j];
+            sum[0] += tmpboard[0][i][j];
+            sum[1] += tmpboard[1][i][j];
         }
     }
 
@@ -106,7 +103,7 @@ static int64_t negamax(const State board[SIZE][SIZE], const State player, const 
 
     // If the depth is not zero, we then check all possible moves
     // This will also catch terminal nodes, because there will be no moves to make
-    State newboard[SIZE][SIZE];
+    State tmpboard[SIZE][SIZE];
 
     int64_t score = LOOSE;
 
@@ -116,15 +113,15 @@ static int64_t negamax(const State board[SIZE][SIZE], const State player, const 
             if (board[i][j] != player) continue;
 
             // Search up
-            board_copy(newboard, board);
+            board_copy(tmpboard, board);
             for (size_t k = i; k >= 2; k -= 2) {
                 if (board[k - 1][j] == !player && board[k - 2][j] == EMPTY) {
 
-                    newboard[k][i] = EMPTY;
-                    newboard[k - 1][j] = EMPTY;
-                    newboard[k - 2][j] = player;
+                    tmpboard[k][i] = EMPTY;
+                    tmpboard[k - 1][j] = EMPTY;
+                    tmpboard[k - 2][j] = player;
 
-                    int64_t val = -negamax(newboard, !player, depth - 1);
+                    int64_t val = -negamax(tmpboard, !player, depth - 1);
 
                     if (val > score)
                         score = val;
@@ -133,15 +130,15 @@ static int64_t negamax(const State board[SIZE][SIZE], const State player, const 
             }
 
             // Search right
-            board_copy(newboard, board);
+            board_copy(tmpboard, board);
             for (size_t k = j; k < SIZE - 2; k += 2) {
                 if (board[i][k + 1] == !player && board[i][k + 2] == EMPTY) {
 
-                    newboard[i][k] = EMPTY;
-                    newboard[i][k + 1] = EMPTY;
-                    newboard[i][k + 2] = player;
+                    tmpboard[i][k] = EMPTY;
+                    tmpboard[i][k + 1] = EMPTY;
+                    tmpboard[i][k + 2] = player;
 
-                    int64_t val = -negamax(newboard, !player, depth - 1);
+                    int64_t val = -negamax(tmpboard, !player, depth - 1);
 
                     if (val > score)
                         score = val;
@@ -150,15 +147,15 @@ static int64_t negamax(const State board[SIZE][SIZE], const State player, const 
             }
 
             // Search left
-            board_copy(newboard, board);
+            board_copy(tmpboard, board);
             for (size_t k = j; k >= 2; k -= 2) {
                 if (board[i][k - 1] == !player && board[i][k - 2] == EMPTY) {
 
-                    newboard[i][k] = EMPTY;
-                    newboard[i][k - 1] = EMPTY;
-                    newboard[i][k - 2] = player;
+                    tmpboard[i][k] = EMPTY;
+                    tmpboard[i][k - 1] = EMPTY;
+                    tmpboard[i][k - 2] = player;
 
-                    int64_t val = -negamax(newboard, !player, depth - 1);
+                    int64_t val = -negamax(tmpboard, !player, depth - 1);
 
                     if (val > score)
                         score = val;
@@ -167,15 +164,15 @@ static int64_t negamax(const State board[SIZE][SIZE], const State player, const 
             }
 
             // Search down
-            board_copy(newboard, board);
+            board_copy(tmpboard, board);
             for (size_t k = i; k < SIZE - 2; k += 2) {
                 if (board[k + 1][j] == !player && board[k + 2][j] == EMPTY) {
 
-                    newboard[k][j] = EMPTY;
-                    newboard[k + 1][j] = EMPTY;
-                    newboard[k + 2][j] = player;
+                    tmpboard[k][j] = EMPTY;
+                    tmpboard[k + 1][j] = EMPTY;
+                    tmpboard[k + 2][j] = player;
 
-                    int64_t val = -negamax(newboard, !player, depth - 1);
+                    int64_t val = -negamax(tmpboard, !player, depth - 1);
 
                     if (val > score)
                         score = val;
@@ -185,5 +182,99 @@ static int64_t negamax(const State board[SIZE][SIZE], const State player, const 
         }
     }
 
+    return score;
+}
+
+int64_t nextmove(State newboard[SIZE][SIZE], const State board[SIZE][SIZE], const State player) {
+
+    State tmpboard[SIZE][SIZE];
+
+    int64_t score = LOOSE;
+
+    for (size_t i = 0; i < SIZE; ++i) {
+        for (size_t j = 0; j < SIZE; ++j) {
+
+            if (board[i][j] != player) continue;
+
+            // Search up
+            board_copy(tmpboard, board);
+            for (size_t k = i; k >= 2; k -= 2) {
+                if (board[k - 1][j] == !player && board[k - 2][j] == EMPTY) {
+
+                    tmpboard[k][i] = EMPTY;
+                    tmpboard[k - 1][j] = EMPTY;
+                    tmpboard[k - 2][j] = player;
+
+                    int64_t val = -negamax(tmpboard, !player, depth - 1);
+
+                    // If this move is better than the current best, then record that move
+                    if (val > score) {
+                        score = val;
+                        board_copy(newboard, tmpboard);
+                    }
+
+                } else break;
+            }
+
+            // Search right
+            board_copy(tmpboard, board);
+            for (size_t k = j; k < SIZE - 2; k += 2) {
+                if (board[i][k + 1] == !player && board[i][k + 2] == EMPTY) {
+
+                    tmpboard[i][k] = EMPTY;
+                    tmpboard[i][k + 1] = EMPTY;
+                    tmpboard[i][k + 2] = player;
+
+                    int64_t val = -negamax(tmpboard, !player, depth - 1);
+
+                    if (val > score) {
+                        score = val;
+                        board_copy(newboard, tmpboard);
+                    }
+
+                } else break;
+            }
+
+            // Search left
+            board_copy(tmpboard, board);
+            for (size_t k = j; k >= 2; k -= 2) {
+                if (board[i][k - 1] == !player && board[i][k - 2] == EMPTY) {
+
+                    tmpboard[i][k] = EMPTY;
+                    tmpboard[i][k - 1] = EMPTY;
+                    tmpboard[i][k - 2] = player;
+
+                    int64_t val = -negamax(tmpboard, !player, depth - 1);
+
+                    if (val > score) {
+                        score = val;
+                        board_copy(newboard, tmpboard);
+                    }
+
+                } else break;
+            }
+
+            // Search down
+            board_copy(tmpboard, board);
+            for (size_t k = i; k < SIZE - 2; k += 2) {
+                if (board[k + 1][j] == !player && board[k + 2][j] == EMPTY) {
+
+                    tmpboard[k][j] = EMPTY;
+                    tmpboard[k + 1][j] = EMPTY;
+                    tmpboard[k + 2][j] = player;
+
+                    int64_t val = -negamax(tmpboard, !player, depth - 1);
+
+                    if (val > score) {
+                        score = val;
+                        board_copy(newboard, tmpboard);
+                    }
+
+                } else break;
+            }
+        }
+    }
+
+    // If there is no move to make, then the score will be LOOSE.
     return score;
 }
