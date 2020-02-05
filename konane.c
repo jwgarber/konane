@@ -120,15 +120,17 @@ static void begin_game(State board[SIZE][SIZE]){
     if(next_col == curr_col){ // up down
         int jump = next_row - curr_row;
         for(int i = 1; i < abs(jump); i++){
-                if(jump < 0){ // up
-                    if(board[curr_row - 1][curr_col] != WHITE){
+            if(jump < 0){ // up
+                    if(board[curr_row - 1][curr_col] != WHITE || jump > -2){
                         printf("Illegal move: up\n");
                         begin_game(board);
                     }
-                    board[curr_row - i][curr_col] = EMPTY;
+                    else{
+                        board[curr_row - i][curr_col] = EMPTY;
+                    }
                 }
                 if(jump > 0){ // down
-                    if(board[curr_row + 1][curr_col] != WHITE){
+                    if(board[curr_row + 1][curr_col] != WHITE || jump < 2){
                         printf("Illegal move: down\n");
                         begin_game(board);
                     }
@@ -142,18 +144,22 @@ static void begin_game(State board[SIZE][SIZE]){
         int jump = next_col - curr_col;
         for(int i = 1; i < abs(jump); i++){
                 if(jump < 0){ // left
-                    if(board[curr_row][curr_col - 1] != WHITE){
+                    if(board[curr_row][curr_col - 1] != WHITE || jump > -2){
                         printf("Illegal move: left\n");
                         begin_game(board);
                     }
-                    board[curr_row][curr_col - i] = EMPTY;
+                    else{
+                        board[curr_row][curr_col - i] = EMPTY;
+                    }
                 }
                 if(jump > 0){ // right
-                    if(board[curr_row][curr_col + 1] != WHITE){
+                    if(board[curr_row][curr_col + 1] != WHITE || jump < 2){
                         printf("Illegal move: right\n");
                         begin_game(board);
                     }
-                    board[curr_row][curr_col + i] = EMPTY;
+                    else{
+                        board[curr_row][curr_col + i] = EMPTY;
+                    }
                 }
         }
     }
