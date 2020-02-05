@@ -88,25 +88,49 @@ static State getUser(void){
     }
 }
 
+static void user_black(State board[SIZE][SIZE]){
+    printf("Do you want you remove from the middle or corner? (m/c): ");
+    char start_move;
+    scanf(" %c", &start_move);
+    if(start_move == 'm'){
+        board[2][2] = EMPTY;
+        board[2][3] = EMPTY;
+        printf("\n");
+        printBoard(board);
+        printf("\n");
+    }
+    if(start_move == 'c'){
+        board[0][0] = EMPTY;
+        board[0][1] = EMPTY;
+        printf("\n");
+        printBoard(board);
+        printf("\n");
+    }
+
+}
+
 int main(void){
 	State board[SIZE][SIZE];
 	initBoard(board);
 	printBoard(board);
     State user = getUser();
-
     if(user == BLACK){
+        user_black(board);
+    }
+
+    return 1;
+}
+
+
+/*
         printf("\nRemove one: ");
         int curr_row;
         char curr_col;
         scanf(" %c%d", &curr_col, &curr_row);
+        //error handle incorrect starting move.
+        //Possible moves = a0, f5, c2, d3
         board[curr_row][curr_col - 'a'] = EMPTY;
     }
     printf("\n");
-    printBoard(board);
-
-
-
-
-
-    return 1;
-}
+    return;
+*/
