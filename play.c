@@ -3,17 +3,6 @@
 
 #include "play.h"
 
-#define WIN      (SIZE * SIZE)
-#define LOOSE    (-SIZE * SIZE)
-
-static void board_copy(State dst[SIZE][SIZE], const State src[SIZE][SIZE]) {
-    for (size_t i = 0; i < SIZE; ++i) {
-        for (size_t j = 0; j < SIZE; ++j) {
-            dst[i][j] = src[i][j];
-        }
-    }
-}
-
 // Winning is the best possible outcome, and losing is the worst possible
 // It is impossible to be able to move to every single spot on a single turn,
 // so SIZE * SIZE will be greater than every possible score. Likewise,
