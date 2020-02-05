@@ -42,8 +42,7 @@ static void initBoard(State board[SIZE][SIZE]){
 			if(i%2 == 0){
 				board[i][j] = BLACK;
 				board[i][j+1] = WHITE;
-			}
-			else{
+			}else{
 				board[i][j] = WHITE;
 				board[i][j+1] = BLACK;
 			}
@@ -100,14 +99,11 @@ static void user_black(State board[SIZE][SIZE]){
     if(start_move == 'm'){
         board[2][2] = EMPTY;
         board[2][3] = EMPTY;
-        printf("\n");
         printBoard(board);
-        printf("\n");
     }
     if(start_move == 'c'){
         board[0][0] = EMPTY;
         board[0][1] = EMPTY;
-        printf("\n");
         printBoard(board);
     }
 
@@ -121,32 +117,48 @@ static void begin_game(State board[SIZE][SIZE]){
     //error handle illegal moves
     curr_col = char_curr_col - 'a';
     next_col = char_next_col - 'a';
-    board[curr_row][curr_col] = EMPTY;
-    board[next_row][next_col] = BLACK;
-
-    if(next_col == curr_col){
+    if(next_col == curr_col){ // up down
         int jump = next_row - curr_row;
         for(int i = 1; i < abs(jump); i++){
-                if(jump < 0){
+                if(jump < 0){ // up
+                    if(board[curr_row - 1][curr_col] != WHITE){
+                        printf("Illegal move: up\n");
+                        begin_game(board);
+                    }
                     board[curr_row - i][curr_col] = EMPTY;
                 }
-                if(jump > 0){
-                    board[curr_row + i][curr_col] = EMPTY;
+                if(jump > 0){ // down
+                    if(board[curr_row + 1][curr_col] != WHITE){
+                        printf("Illegal move: down\n");
+                        begin_game(board);
+                    }
+                    else{
+                        board[curr_row + i][curr_col] = EMPTY;
+                    }
                 }
-            }
+        }
     }
-    if(next_row == curr_row){
+    if(next_row == curr_row){ // left right
         int jump = next_col - curr_col;
         for(int i = 1; i < abs(jump); i++){
-                if(jump < 0){
+                if(jump < 0){ // left
+                    if(board[curr_row][curr_col - 1] != WHITE){
+                        printf("Illegal move: left\n");
+                        begin_game(board);
+                    }
                     board[curr_row][curr_col - i] = EMPTY;
                 }
-                if(jump > 0){
+                if(jump > 0){ // right
+                    if(board[curr_row][curr_col + 1] != WHITE){
+                        printf("Illegal move: right\n");
+                        begin_game(board);
+                    }
                     board[curr_row][curr_col + i] = EMPTY;
                 }
         }
     }
-    printf("\n");
+    board[curr_row][curr_col] = EMPTY;
+    board[next_row][next_col] = BLACK;
     printBoard(board);
 }
 
@@ -179,17 +191,3 @@ int main(void){
     }
     return 1;
 }
-
-
-/*
-        printf("\nRemove one: ");
-        int curr_row;
-        char curr_col;
-        scanf(" %c%d", &curr_col, &curr_row);
-        //error handle incorrect starting move.
-        //Possible moves = a0, f5, c2, d3
-        board[curr_row][curr_col - 'a'] = EMPTY;
-    }
-    printf("\n");
-    return;
-*/
