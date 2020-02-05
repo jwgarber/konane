@@ -67,7 +67,6 @@ static void printBoard(const State board[SIZE][SIZE]){
             }
         }
         printf("\n");
-
     }
 }
 
@@ -104,10 +103,42 @@ static void user_black(State board[SIZE][SIZE]){
         board[0][1] = EMPTY;
         printf("\n");
         printBoard(board);
-        printf("\n");
     }
 
 }
+
+static void begin_game(State board[SIZE][SIZE]){
+    printf("\nMake a move (from to): ");
+    int curr_row, next_row;
+    char char_curr_col, char_next_col;
+    scanf(" %c%d %c%d", &char_curr_col, &curr_row, &char_next_col, &next_row);
+    //error handle illegal moves
+    int curr_col, next_col;
+    curr_col = char_curr_col - 'a';
+    next_col = char_next_col - 'a';
+    board[curr_row][curr_col] = EMPTY;
+    board[next_row][next_col] = BLACK;
+    if(next_col == curr_col){
+        if(next_row < curr_row){
+            board[curr_row-1][curr_col] = EMPTY;
+        }
+        if(next_row > curr_row){
+            board[curr_row+1][curr_col] = EMPTY;
+        }
+    }
+    if(next_row == curr_row){
+        if(next_col < curr_col){
+            board[curr_row][curr_col-1] = EMPTY;
+        }
+        if(next_col > curr_col){
+            board[curr_row][curr_col+1] = EMPTY;
+        }
+    }
+    printf("\n");
+    printBoard(board);
+
+}
+
 
 int main(void){
 	State board[SIZE][SIZE];
@@ -117,7 +148,7 @@ int main(void){
     if(user == BLACK){
         user_black(board);
     }
-
+    begin_game(board);
     return 1;
 }
 
