@@ -49,16 +49,13 @@ static void initBoard(State board[SIZE][SIZE]){
 }
 
 static void printBoard(const State board[SIZE][SIZE]){
-    printf("  ");
+    printf(" ");
     for(int i = 'a'; i < 'a' + SIZE; i++){
         printf(" %c", i);
     }
     printf("\n");
     for(int i = 0; i < SIZE; i++){
 		printf("%d", i);
-        if(i < 8){
-            printf(" ");
-        }
         for(int j = 0; j < SIZE; j++){
             switch(board[i][j]){
                 case BLACK:
@@ -66,7 +63,7 @@ static void printBoard(const State board[SIZE][SIZE]){
                 case WHITE:
                     printf(" %s", WHITE_CIRCLE); break;
                 case EMPTY:
-                    printf(" "); break;
+                    printf("  "); break;
             }
         }
         printf("\n");
@@ -99,14 +96,17 @@ int main(void){
 
     if(user == BLACK){
         printf("\nRemove one: ");
-        int curr_row, next_row;
-        char curr_col, next_col;
-        scanf("%c%d", &curr_col, &curr_row);
-        printf("row = %d, col = %c", curr_row, curr_col);
-
-//        board[curr_row][1] = EMPTY;
+        int curr_row;
+        char curr_col;
+        scanf(" %c%d", &curr_col, &curr_row);
+        board[curr_row][curr_col - 'a'] = EMPTY;
     }
+    printf("\n");
     printBoard(board);
+
+
+
+
 
     return 1;
 }
