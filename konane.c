@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 #include "konane.h"
 #include "solve.h"
+#include "play.h"
 
 #define WHITE_CIRCLE "○"
 #define BLACK_CIRCLE "●"
@@ -49,6 +52,9 @@ static void initBoard(State board[SIZE][SIZE]){
 }
 
 static void printBoard(const State board[SIZE][SIZE]){
+    // Clear the screen in between.
+    system("clear");
+
     printf(" ");
     for(int i = 'a'; i < 'a' + SIZE; i++){
         printf(" %c", i);
@@ -71,7 +77,7 @@ static void printBoard(const State board[SIZE][SIZE]){
 }
 
 static State getUser(void){
-    printf("\nDo you want to play black or white? (b/w)\n");
+    printf("\nDo you want to play black or white? (b/w): ");
     char user;
     scanf("%s", &user);
     //error handle various entries
@@ -139,7 +145,6 @@ static void begin_game(State board[SIZE][SIZE]){
 
 }
 
-
 int main(void){
 	State board[SIZE][SIZE];
 	initBoard(board);
@@ -148,7 +153,25 @@ int main(void){
     if(user == BLACK){
         user_black(board);
     }
-    begin_game(board);
+
+    bool game_over = false;
+    while (!game_over) {
+        begin_game(board);
+
+        // computer move
+        State newboard[SIZE][SIZE] = {};
+        int64_t score = nextmove(newboard, board, WHITE);
+        board_copy(board, newboard);
+
+        system("sleep 1");
+
+        printBoard(board);
+
+        if (score == LOOSE) {
+            puts("You won!");
+            game_over = true;
+        }
+    }
     return 1;
 }
 
