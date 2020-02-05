@@ -126,28 +126,24 @@ static void begin_game(State board[SIZE][SIZE]){
 
     if(next_col == curr_col){
         int jump = next_row - curr_row;
-        if(jump < 0){
-            for(int i = 1; i < -jump; i++){
-                board[curr_row - i][curr_col] = EMPTY;
+        for(int i = 1; i < abs(jump); i++){
+                if(jump < 0){
+                    board[curr_row - i][curr_col] = EMPTY;
+                }
+                if(jump > 0){
+                    board[curr_row + i][curr_col] = EMPTY;
+                }
             }
-        }
-        if(jump > 0){
-            for(int i = 1; i < jump; i++){
-                board[curr_row + i][curr_col] = EMPTY;
-            }
-        }
     }
     if(next_row == curr_row){
         int jump = next_col - curr_col;
-        if(jump < 0){
-            for(int i = 1; i < -jump; i++){
-                board[curr_row][curr_col - i] = EMPTY;
-            }
-        }
-        if(jump > 0){
-            for(int i = 1; i < jump; i++){
-                board[curr_row][curr_col + 1] = EMPTY;
-            }
+        for(int i = 1; i < abs(jump); i++){
+                if(jump < 0){
+                    board[curr_row][curr_col - i] = EMPTY;
+                }
+                if(jump > 0){
+                    board[curr_row][curr_col + i] = EMPTY;
+                }
         }
     }
     printf("\n");
