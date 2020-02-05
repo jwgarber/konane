@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include "play.h"
+
 #define WIN      (SIZE * SIZE)
 #define LOOSE    (-SIZE * SIZE)
 
@@ -190,6 +192,8 @@ int64_t nextmove(State newboard[SIZE][SIZE], const State board[SIZE][SIZE], cons
     State tmpboard[SIZE][SIZE];
 
     int64_t score = LOOSE;
+
+    uint32_t depth = 2;
 
     for (size_t i = 0; i < SIZE; ++i) {
         for (size_t j = 0; j < SIZE; ++j) {
