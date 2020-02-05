@@ -8,4 +8,3 @@ typedef enum {
 
 /*#define SIZE	4*/
 #define SIZE	6
-
