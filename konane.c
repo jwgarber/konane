@@ -109,34 +109,43 @@ static void user_black(State board[SIZE][SIZE]){
 
 static void begin_game(State board[SIZE][SIZE]){
     printf("\nMake a move (from to): ");
-    int curr_row, next_row;
+    int curr_row, next_row, curr_col, next_col;
     char char_curr_col, char_next_col;
     scanf(" %c%d %c%d", &char_curr_col, &curr_row, &char_next_col, &next_row);
     //error handle illegal moves
-    int curr_col, next_col;
     curr_col = char_curr_col - 'a';
     next_col = char_next_col - 'a';
     board[curr_row][curr_col] = EMPTY;
     board[next_row][next_col] = BLACK;
+
     if(next_col == curr_col){
-        if(next_row < curr_row){
-            board[curr_row-1][curr_col] = EMPTY;
+        int jump = next_row - curr_row;
+        if(jump < 0){
+            for(int i = 1; i < -jump; i++){
+                board[curr_row - i][curr_col] = EMPTY;
+            }
         }
-        if(next_row > curr_row){
-            board[curr_row+1][curr_col] = EMPTY;
+        if(jump > 0){
+            for(int i = 1; i < jump; i++){
+                board[curr_row + i][curr_col] = EMPTY;
+            }
         }
     }
     if(next_row == curr_row){
-        if(next_col < curr_col){
-            board[curr_row][curr_col-1] = EMPTY;
+        int jump = next_col - curr_col;
+        if(jump < 0){
+            for(int i = 1; i < -jump; i++){
+                board[curr_row][curr_col - i] = EMPTY;
+            }
         }
-        if(next_col > curr_col){
-            board[curr_row][curr_col+1] = EMPTY;
+        if(jump > 0){
+            for(int i = 1; i < jump; i++){
+                board[curr_row][curr_col + 1] = EMPTY;
+            }
         }
     }
     printf("\n");
     printBoard(board);
-
 }
 
 
