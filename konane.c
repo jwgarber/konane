@@ -123,7 +123,7 @@ static void begin_game(State board[SIZE][SIZE]){
             if(jump < 0){ // up
                     if(board[curr_row - 1][curr_col] != WHITE || jump > -2){
                         printf("Illegal move: up\n");
-                        begin_game(board);
+                       // begin_game(board);
                     }
                     else{
                         board[curr_row - i][curr_col] = EMPTY;
@@ -132,7 +132,7 @@ static void begin_game(State board[SIZE][SIZE]){
                 if(jump > 0){ // down
                     if(board[curr_row + 1][curr_col] != WHITE || jump < 2){
                         printf("Illegal move: down\n");
-                        begin_game(board);
+                      //  begin_game(board);
                     }
                     else{
                         board[curr_row + i][curr_col] = EMPTY;
@@ -146,7 +146,7 @@ static void begin_game(State board[SIZE][SIZE]){
                 if(jump < 0){ // left
                     if(board[curr_row][curr_col - 1] != WHITE || jump > -2){
                         printf("Illegal move: left\n");
-                        begin_game(board);
+                      //  begin_game(board);
                     }
                     else{
                         board[curr_row][curr_col - i] = EMPTY;
@@ -155,7 +155,7 @@ static void begin_game(State board[SIZE][SIZE]){
                 if(jump > 0){ // right
                     if(board[curr_row][curr_col + 1] != WHITE || jump < 2){
                         printf("Illegal move: right\n");
-                        begin_game(board);
+                      //  begin_game(board);
                     }
                     else{
                         board[curr_row][curr_col + i] = EMPTY;
@@ -186,7 +186,7 @@ int main(void){
         int64_t score = nextmove(newboard, board, WHITE);
         board_copy(board, newboard);
 
-        system("sleep 1");
+        system("sleep 2");
 
         printBoard(board);
 
