@@ -10,32 +10,6 @@
 #define WHITE_CIRCLE "○"
 #define BLACK_CIRCLE "●"
 
-#if 0
-State board41[SIZE][SIZE] = {{EMPTY, EMPTY, BLACK, WHITE},
-                            {WHITE, BLACK, WHITE, BLACK},
-                            {BLACK, WHITE, BLACK, WHITE},
-                            {WHITE, BLACK, WHITE, BLACK}};
-
-State board42[SIZE][SIZE] = {{BLACK, WHITE, BLACK, WHITE},
-                            {WHITE, EMPTY, EMPTY, BLACK},
-                            {BLACK, WHITE, BLACK, WHITE},
-                            {WHITE, BLACK, WHITE, BLACK}};
-
-State board61[SIZE][SIZE] = {{EMPTY, EMPTY, BLACK, WHITE, BLACK, WHITE},
-                             {WHITE, BLACK, WHITE, BLACK, WHITE, BLACK},
-                             {BLACK, WHITE, BLACK, WHITE, BLACK, WHITE},
-                             {WHITE, BLACK, WHITE, BLACK, WHITE, BLACK},
-                             {BLACK, WHITE, BLACK, WHITE, BLACK, WHITE},
-                             {WHITE, BLACK, WHITE, BLACK, WHITE, BLACK}};
-
-State board62[SIZE][SIZE] = {{BLACK, WHITE, BLACK, WHITE, BLACK, WHITE},
-                             {WHITE, BLACK, WHITE, BLACK, WHITE, BLACK},
-                             {BLACK, WHITE, EMPTY, EMPTY, BLACK, WHITE},
-                             {WHITE, BLACK, WHITE, BLACK, WHITE, BLACK},
-                             {BLACK, WHITE, BLACK, WHITE, BLACK, WHITE},
-                             {WHITE, BLACK, WHITE, BLACK, WHITE, BLACK}};
-#endif
-
 static void initBoard(State board[SIZE][SIZE]){
 	for(int i = 0; i < SIZE; i++){
 		for(int j = 0; j < SIZE; j = j+2){
@@ -177,23 +151,25 @@ int main(void){
         user_black(board);
     }
 
-    bool game_over = false;
-    while (!game_over) {
+    while (true) {
         begin_game(board);
 
-        // computer move
-        State newboard[SIZE][SIZE] = {};
-        int64_t score = nextmove(newboard, board, WHITE);
-        board_copy(board, newboard);
-
-        system("sleep 2");
-
-        printBoard(board);
+        // Computer move
+        Move move = {};
+        int64_t score = computer_move(&move, board, WHITE);
 
         if (score == LOOSE) {
             puts("You won!");
-            game_over = true;
+            break;
         }
+
+        // Make the next move
+        /*make_move(board, &move);*/
+
+        printBoard(board);
+        // print the computer move
+
+        system("sleep 1");
     }
     return 1;
 }

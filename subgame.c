@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "konane.h"
+#if 0
 
 // Max number of connected components is board size^2 / 2.
 // We should technically perhaps add 1, since the CCs are
@@ -115,3 +116,4 @@ static void merge_cc(uint32_t cc[SIZE][SIZE], uint32_t dist[MAXCC][MAXCC], const
     // We do merge connected components together, but
 
 }
+#endif
