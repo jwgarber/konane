@@ -142,6 +142,51 @@ static void begin_game(State board[SIZE][SIZE]){
     printBoard(board);
 }
 
+// read a move in from the user
+static void user_move(Move* move) {
+
+    while (true) {
+        // use printf and scanf to read a move of input from the user
+        // if you cannot read the input, or the move is outside the boundary of the board
+        // then print and error message and continue the loop to give them another try
+        // if their move is valid, then store the coordinates in the move struct and return.
+    }
+}
+
+// Try to make the current move
+static int make_move(State board[SIZE][SIZE], const Move* move, const State color) {
+
+    // Here, the player 'color' is trying to make a new move
+    // We try to make the new move, and also check if the move is valid.
+    // First, check if the color of the player making the move actually matches
+    // the color of the stone at the start position (start_row, start_col)
+
+    // If so, then on the temporary board, start iterating to the new position
+    // given by (end_row, end_col).
+
+    // If at any point, the jump doesn't work (eg. we are jumping over a stone
+    // of the wrong color), then return an error (-1)
+
+    // If making the move succeeds, then copy the temporary board to the actual board
+
+    State tmpboard[SIZE][SIZE];
+    board_copy(tmpboard, board);
+
+    // If the move is up
+
+    // If the move is right
+
+    // If the move is left
+
+    // If the move is down
+
+    // If none of those, then an error
+
+    // Otherwise, everything is good, so copy the board back.
+    board_copy(board, tmpboard);
+    return 1;
+}
+
 int main(void){
 	State board[SIZE][SIZE];
 	initBoard(board);
@@ -151,11 +196,41 @@ int main(void){
         user_black(board);
     }
 
+    Move move = {};
+
     while (true) {
-        begin_game(board);
+
+        // Check if the BLACK user has a move to make.
+        // If not, then game_over, so print a message and exit the game
+        if (game_over(&board, BLACK)) {
+            puts("Computer won!");
+            break;
+        }
+
+        // This function needs to be split into user_move() and make_move()
+        /*begin_game(board);*/
+
+        // Try to get a user move
+        while (true) {
+
+            // Read in the move from the user.
+            user_move(&move);
+
+            int val = make_move(board, &move);
+
+            if (val == -1) {
+                // User made an invalid move, so print a message telling them that
+                // On the next iteration of the loop they can try again
+                printf();
+            } else {
+                // Otherwise the move is good, so break out of the loop
+                break;
+            }
+        }
+
+        // Now the computer makes a move
 
         // Computer move
-        Move move = {};
         int64_t score = computer_move(&move, board, WHITE);
 
         if (score == LOOSE) {
@@ -163,11 +238,8 @@ int main(void){
             break;
         }
 
-        // Make the next move
-        /*make_move(board, &move);*/
-
-        printBoard(board);
         // print the computer move
+        printBoard(board);
 
         system("sleep 1");
     }
