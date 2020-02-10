@@ -28,7 +28,7 @@ int32_t negamax(const State board[SIZE][SIZE], const State player) {
             for (size_t k = i; k >= 2; k -= 2) {
                 if (board[k - 1][j] == !player && board[k - 2][j] == EMPTY) {
 
-                    newboard[k][i] = EMPTY;
+                    newboard[k][j] = EMPTY;
                     newboard[k - 1][j] = EMPTY;
                     newboard[k - 2][j] = player;
 

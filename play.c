@@ -108,7 +108,7 @@ static int64_t negamax(const State board[SIZE][SIZE], const State color, const u
             for (size_t k = i; k >= 2; k -= 2) {
                 if (board[k - 1][j] == !color && board[k - 2][j] == EMPTY) {
 
-                    tmpboard[k][i] = EMPTY;
+                    tmpboard[k][j] = EMPTY;
                     tmpboard[k - 1][j] = EMPTY;
                     tmpboard[k - 2][j] = color;
 
@@ -194,7 +194,7 @@ int64_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
             for (size_t k = i; k >= 2; k -= 2) {
                 if (board[k - 1][j] == !color && board[k - 2][j] == EMPTY) {
 
-                    tmpboard[k][i] = EMPTY;
+                    tmpboard[k][j] = EMPTY;
                     tmpboard[k - 1][j] = EMPTY;
                     tmpboard[k - 2][j] = color;
 
