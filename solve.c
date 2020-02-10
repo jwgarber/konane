@@ -10,13 +10,11 @@ static void board_copy(State dst[SIZE][SIZE], const State src[SIZE][SIZE]) {
     }
 }
 
-// In this case we are solving the game, so we don't need to worry about
-// the heuristic score. So +1 and -1 will do.
 int32_t negamax(const State board[SIZE][SIZE], const State player) {
 
     State newboard[SIZE][SIZE];
 
-    int score = -1;
+    int score = LOOSE;
 
     for (size_t i = 0; i < SIZE; ++i) {
         for (size_t j = 0; j < SIZE; ++j) {
@@ -35,11 +33,8 @@ int32_t negamax(const State board[SIZE][SIZE], const State player) {
                     int32_t val = -negamax(newboard, !player);
 
                     // If we have found a winning move, we don't need to do any more searching
-                    if (val == 1)
-                        return 1;
-
-                    /*if (val > score)*/
-                        /*score = val;*/
+                    if (val == WIN)
+                        return WIN;
 
                 } else break;
             }
@@ -55,11 +50,8 @@ int32_t negamax(const State board[SIZE][SIZE], const State player) {
 
                     int32_t val = -negamax(newboard, !player);
 
-                    if (val == 1)
-                        return 1;
-
-                    /*if (val > score)*/
-                        /*score = val;*/
+                    if (val == WIN)
+                        return WIN;
 
                 } else break;
             }
@@ -75,11 +67,8 @@ int32_t negamax(const State board[SIZE][SIZE], const State player) {
 
                     int32_t val = -negamax(newboard, !player);
 
-                    if (val == 1)
-                        return 1;
-
-                    /*if (val > score)*/
-                        /*score = val;*/
+                    if (val == WIN)
+                        return WIN;
 
                 } else break;
             }
@@ -95,11 +84,8 @@ int32_t negamax(const State board[SIZE][SIZE], const State player) {
 
                     int32_t val = -negamax(newboard, !player);
 
-                    if (val == 1)
-                        return 1;
-
-                    /*if (val > score)*/
-                        /*score = val;*/
+                    if (val == WIN)
+                        return WIN;
 
                 } else break;
             }
