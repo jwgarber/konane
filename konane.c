@@ -71,8 +71,8 @@ static void user_black(State board[SIZE][SIZE]){
     char start_move;
     scanf(" %c", &start_move);
     if(start_move == 'm'){
-        board[2][2] = EMPTY;
-        board[2][3] = EMPTY;
+        board[-1 + SIZE/2][-1 + SIZE/2] = EMPTY;
+        board[-1 + SIZE/2][SIZE/2] = EMPTY;
         printBoard(board);
     }
     if(start_move == 'c'){
@@ -142,14 +142,19 @@ static void begin_game(State board[SIZE][SIZE]){
     printBoard(board);
 }
 
-// read a move in from the user
 static void user_move(Move* move) {
 
     while (true) {
-        // use printf and scanf to read a move of input from the user
-        // if you cannot read the input, or the move is outside the boundary of the board
-        // then print and error message and continue the loop to give them another try
-        // if their move is valid, then store the coordinates in the move struct and return.
+        printf("\nMake a move (from to): ");
+        char char_start_col, char_end_col;
+        scanf(" %c%zu %c%zu", &char_start_col, &move->start_row, &char_end_col, &move->end_row);
+        move->start_col = (size_t) char_start_col - 'a';
+        move->end_col = (size_t) char_end_col - 'a';
+        if (0 <= (int) move->start_row && SIZE > (int) move->start_row && 0 <= (int) move->end_row && SIZE > (int) move->end_row &&
+                0 <= (int) move->start_col && SIZE > (int) move->start_col && 0 <= (int) move->end_col && SIZE > (int) move->end_col) return;
+        else{
+            printf("Re-enter move\n");
+        }
     }
 }
 
@@ -187,6 +192,20 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
     return 1;
 }
 
+bool game_over(const State board[SIZE][SIZE], const State player){
+    for(size_t i = 0; i < SIZE; ++i){
+        for(size_t j = 0; j < SIZE; ++j){
+            const State color = board[i][j];
+            if(color != player) continue;
+            if(i >=2 && board[i-1][j] == !color && board[i-2][j] == EMPTY) return true;
+            if(j < SIZE - 2 && board[i][j+1] == !color && board[i][j+2] == EMPTY) return true;
+            if(j >= 2 && board[i][j-1] == !color && board[i][j-2] == EMPTY) return true;
+            if(i < SIZE - 2 && board[i+1][j] == !color && board[i+2][j] == EMPTY) return true;
+        }
+    }
+    return false;
+}
+
 int main(void){
 	State board[SIZE][SIZE];
 	initBoard(board);
@@ -199,10 +218,7 @@ int main(void){
     Move move = {};
 
     while (true) {
-
-        // Check if the BLACK user has a move to make.
-        // If not, then game_over, so print a message and exit the game
-        if (game_over(&board, BLACK)) {
+        if (game_over(board, BLACK)) {
             puts("Computer won!");
             break;
         }
@@ -216,12 +232,12 @@ int main(void){
             // Read in the move from the user.
             user_move(&move);
 
-            int val = make_move(board, &move);
+            int val = make_move(board, &move, user);
 
             if (val == -1) {
                 // User made an invalid move, so print a message telling them that
                 // On the next iteration of the loop they can try again
-                printf();
+                printf("");
             } else {
                 // Otherwise the move is good, so break out of the loop
                 break;
