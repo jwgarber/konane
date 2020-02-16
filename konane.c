@@ -117,10 +117,10 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
     }
 
     // coordinate bounds check
-    if (0 > (int) move->start_row || SIZE < (int) move->start_row ||
-            0 > (int) move->end_row || SIZE < (int) move->end_row ||
-            0 > (int) move->start_col || SIZE < (int) move->start_col ||
-            0 > (int) move->end_col || SIZE < (int) move->end_col){
+    if (0 > (int) move->start_row || SIZE <= (int) move->start_row ||
+            0 > (int) move->end_row || SIZE <= (int) move->end_row ||
+            0 > (int) move->start_col || SIZE <= (int) move->start_col ||
+            0 > (int) move->end_col || SIZE <= (int) move->end_col){
         return -1;
     }
 
