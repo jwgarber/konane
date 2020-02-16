@@ -80,7 +80,7 @@ static void user_black(State board[SIZE][SIZE]){
     }
 }
 
-bool game_over(const State board[SIZE][SIZE], const State player){
+static bool game_over(const State board[SIZE][SIZE], const State player){
     for(size_t i = 0; i < SIZE; ++i){
         for(size_t j = 0; j < SIZE; ++j){
             const State color = board[i][j];
@@ -101,63 +101,34 @@ static int user_move(Move* move) {
         char char_start_col, char_end_col;
         scanf(" %c%zu %c%zu", &char_start_col, &start_row, &char_end_col, &end_row);
         size_t start_col = (size_t) (char_start_col - 'a'), end_col = (size_t) (char_end_col - 'a');
-        // coordinate check
-        if (0 <= (int) start_row && SIZE > (int) start_row &&
-                0 <= (int) end_row && SIZE > (int) end_row &&
-                0 <= (int) start_col && SIZE > (int) start_col &&
-                0 <= (int) end_col && SIZE > (int) end_col){
-            move->start_row = start_row;
-            move->end_row = end_row;
-            move->start_col = start_col;
-            move->end_col = end_col;
-            return 1;
-        } else return -1;
+        move->start_row = start_row;
+        move->end_row = end_row;
+        move->start_col = start_col;
+        move->end_col = end_col;
     }
 }
 
 static int make_move(State board[SIZE][SIZE], const Move* move, const State color) {
+    // diagonal move
+    if(move->start_row != move->end_row){
+            if(move->start_col != move->end_col) return -1;
+    }
+
+    // coordinate bounds check
+    if (0 > (int) move->start_row || SIZE < (int) move->start_row ||
+            0 > (int) move->end_row || SIZE < (int) move->end_row ||
+            0 > (int) move->start_col || SIZE < (int) move->start_col ||
+            0 > (int) move->end_col || SIZE < (int) move->end_col){
+        return -1;
+    }
+
     if (board[move->start_row][move->start_col] == color){
         State tmpboard[SIZE][SIZE];
         board_copy(tmpboard, board);
-       // Horizontal move
-        if(move->end_row == move->start_row){
-            int jump = (int) move->end_col - (int) move->start_col;
-            if (abs(jump) < 2 || abs(jump) > SIZE) return -1;
-            else{
-                if(jump < 0){
-                    // left move
-                    for(size_t i = move->start_col; i > move->end_col; i-=2){
-                        if(tmpboard[move->start_row][i-1] != !color) return -1;
-                        if(tmpboard[move->start_row][i-2] != EMPTY) return -1;
-                        else{
-                            tmpboard[move->start_row][i] = EMPTY;
-                            tmpboard[move->start_row][i-1] = EMPTY;
-                            tmpboard[move->start_row][i-2] = color;
-                        }
-                    }
-                    board_copy(board, tmpboard);
-                    return 1;
-                }
-                if(jump > 0){
-                    // right move
-                    for(size_t i = move->start_col; i < move->end_col; i += 2){
-                        if(tmpboard[move->start_row][i+1] != !color) return -1;
-                        if(tmpboard[move->start_row][i+2] != EMPTY) return -1;
-                        else{
-                            tmpboard[move->start_row][i] = EMPTY;
-                            tmpboard[move->start_row][i+1] = EMPTY;
-                            tmpboard[move->start_row][i+2] = color;
-                        }
-                    }
-                    board_copy(board, tmpboard);
-                    return 1;
-                }
-                return -1;
-            }
-        }
         // Verticle move
         if(move->end_col == move->start_col){
             int jump = (int) move->end_row - (int) move->start_row;
+
             if (abs(jump) < 2 || abs(jump) > SIZE) return -1;
             else{
                 if(jump < 0){
@@ -191,6 +162,43 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
             return -1;
             }
         }
+       // Horizontal move
+        if(move->end_row == move->start_row){
+            int jump = (int) move->end_col - (int) move->start_col;
+
+            if (abs(jump) < 2 || abs(jump) > SIZE) return -1;
+            else{
+                if(jump < 0){
+                    // left move
+                    for(size_t i = move->start_col; i > move->end_col; i-=2){
+                        if(tmpboard[move->start_row][i-1] != !color) return -1;
+                        if(tmpboard[move->start_row][i-2] != EMPTY) return -1;
+                        else{
+                            tmpboard[move->start_row][i] = EMPTY;
+                            tmpboard[move->start_row][i-1] = EMPTY;
+                            tmpboard[move->start_row][i-2] = color;
+                        }
+                    }
+                    board_copy(board, tmpboard);
+                    return 1;
+                }
+                if(jump > 0){
+                    // right move
+                    for(size_t i = move->start_col; i < move->end_col; i += 2){
+                        if(tmpboard[move->start_row][i+1] != !color) return -1;
+                        if(tmpboard[move->start_row][i+2] != EMPTY) return -1;
+                        else{
+                            tmpboard[move->start_row][i] = EMPTY;
+                            tmpboard[move->start_row][i+1] = EMPTY;
+                            tmpboard[move->start_row][i+2] = color;
+                        }
+                    }
+                    board_copy(board, tmpboard);
+                    return 1;
+                }
+                return -1;
+            }
+        }
         else return -1;
     }
     else return -1;
@@ -213,26 +221,18 @@ int main(void){
             break;
         }
 
-
         while (true) {
-
             user_move(&move);
             int val = make_move(board, &move, user);
 
             if (val == -1) {
-                // User made an invalid move, so print a message telling them that
-                // On the next iteration of the loop they can try again
-                printf("");
-            } else {
-                // Otherwise the move is good, so break out of the loop
-                break;
-            }
+                printf("Invlid move\n");
+                continue;
+            } else break;
         }
 
-        // Now the computer makes a move
-
         // Computer move
-        // In the following function call, i changed WHITE to !user
+        // In the following function call, i changed WHITE to !user  - Komal
         int64_t score = computer_move(&move, board, !user);
 
         if (score == LOOSE) {
@@ -240,9 +240,7 @@ int main(void){
             break;
         }
 
-        // print the computer move
         printBoard(board);
-
         system("sleep 1");
     }
     return 1;
