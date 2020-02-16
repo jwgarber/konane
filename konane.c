@@ -234,8 +234,14 @@ int main(void){
         }
 
         // Computer move
-        // In the following function call, i changed WHITE to !user  - Komal
         int64_t score = computer_move(&move, board, !user);
+        // there is a small problem here: computer_move can
+        // neither print_baord nor board_copy.
+        // becasue play.c doesnt have access to print_board
+        // and in computer_move, board is passed as a const;
+        // thus, prohibiting us from board_copy(board, tmpboard)
+        // and doing print_board here after computer_move.
+
 
         if (score == LOOSE) {
             puts("You won!");
@@ -243,7 +249,7 @@ int main(void){
         }
 
         printBoard(board);
-        system("sleep 1");
+        system("sleep 2");
     }
     return 1;
 }
