@@ -85,27 +85,29 @@ static bool game_over(const State board[SIZE][SIZE], const State player){
         for(size_t j = 0; j < SIZE; ++j){
             const State color = board[i][j];
             if(color != player) continue;
-            if(i >=2 && board[i-1][j] == !color && board[i-2][j] == EMPTY) return true;
-            if(j < SIZE - 2 && board[i][j+1] == !color && board[i][j+2] == EMPTY) return true;
-            if(j >= 2 && board[i][j-1] == !color && board[i][j-2] == EMPTY) return true;
-            if(i < SIZE - 2 && board[i+1][j] == !color && board[i+2][j] == EMPTY) return true;
+            if(j >= 2 && board[i][j-1] == !color && board[i][j-2] == EMPTY) return false;
+            if(i >= 2 && board[i-1][j] == !color && board[i-2][j] == EMPTY) return false;
+            if(j < SIZE - 2 && board[i][j+1] == !color && board[i][j+2] == EMPTY) return false;
+            if(i < SIZE - 2 && board[i+1][j] == !color && board[i+2][j] == EMPTY) return false;
         }
     }
-    return false;
+    return true;
 }
 
-static int user_move(Move* move) {
-    while (true) {
-        printf("\nMake a move (from to): ");
-        size_t start_row, end_row;
-        char char_start_col, char_end_col;
-        scanf(" %c%zu %c%zu", &char_start_col, &start_row, &char_end_col, &end_row);
-        size_t start_col = (size_t) (char_start_col - 'a'), end_col = (size_t) (char_end_col - 'a');
-        move->start_row = start_row;
-        move->end_row = end_row;
-        move->start_col = start_col;
-        move->end_col = end_col;
-    }
+static void user_move(Move* move) {
+    printf("\nMake a move (from to): ");
+
+    size_t start_row, end_row;
+    char char_start_col, char_end_col;
+
+    scanf(" %c%zu %c%zu", &char_start_col, &start_row, &char_end_col, &end_row);
+
+    size_t start_col = (size_t) (char_start_col - 'a'), end_col = (size_t) (char_end_col - 'a');
+
+    move->start_row = start_row;
+    move->end_row = end_row;
+    move->start_col = start_col;
+    move->end_col = end_col;
 }
 
 static int make_move(State board[SIZE][SIZE], const Move* move, const State color) {
@@ -147,7 +149,7 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
                 }
                 if(jump > 0){
                     // down move
-                    for(size_t i = move->start_col; i < move->end_col; i += 2){
+                    for(size_t i = move->start_row; i < move->end_row; i += 2){
                         if(tmpboard[i+1][move->start_col] != !color) return -1;
                         if(tmpboard[i+2][move->start_col] != EMPTY) return -1;
                         else{
@@ -209,14 +211,14 @@ int main(void){
 	initBoard(board);
 	printBoard(board);
     State user = getUser();
-    if(user == BLACK){
+    if(user == BLACK){ // make it general
         user_black(board);
     }
 
     Move move = {};
 
     while (true) {
-        if (game_over(board, BLACK)){
+        if (game_over(board, user)){
             puts("Computer won!");
             break;
         }
