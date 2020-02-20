@@ -9,7 +9,7 @@ TARGET = konane
 
 STD = -std=c11
 CC = clang
-WARNINGS = -Weverything -Wno-gnu-empty-initializer
+WARNINGS = -Weverything -Wno-gnu-empty-initializer -fsanitize=undefined
 #WARNINGS = -Wall -Wextra -Wpedantic
 OPTS = -O3 -march=native -flto
 CFLAGS = $(STD) $(WARNINGS) $(OPTS)

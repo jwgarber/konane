@@ -48,35 +48,37 @@ static void printBoard(const State board[SIZE][SIZE]){
 }
 
 static State getUser(void){
-    printf("\nDo you want to play black or white? (b/w): ");
     char user;
-    scanf("%s", &user);
-    //error handle various entries
-    if(user == 'b'){
-        return BLACK;
-    }
-    if(user == 'w'){
-        return WHITE;
-    }
-    else{
-        printf("Invalid entry\n");
-        return EMPTY;
+    putchar('\n');
+    while (true) {
+	printf("Do you want to play black or white? (b/w): ");
+	scanf("%s", &user);
+	if(user == 'b'){
+	    return BLACK;
+	}
+	if(user == 'w'){
+	    return WHITE;
+	}
+	puts("Invalid option, please try again.");
     }
 }
 
 static void user_black(State board[SIZE][SIZE]){
-    printf("Do you want you remove from the middle or corner? (m/c): ");
     char start_move;
-    scanf(" %c", &start_move);
-    if(start_move == 'm'){
-        board[-1 + SIZE/2][-1 + SIZE/2] = EMPTY;
-        board[-1 + SIZE/2][SIZE/2] = EMPTY;
-        printBoard(board);
-    }
-    if(start_move == 'c'){
-        board[0][0] = EMPTY;
-        board[0][1] = EMPTY;
-        printBoard(board);
+    while (true) {
+	printf("Do you want to remove from the middle or corner? (m/c): ");
+	scanf("%s", &start_move);
+	if(start_move == 'm'){
+	    board[-1 + SIZE/2][-1 + SIZE/2] = EMPTY;
+	    board[-1 + SIZE/2][SIZE/2] = EMPTY;
+	    return;
+	}
+	if(start_move == 'c'){
+	    board[0][0] = EMPTY;
+	    board[0][1] = EMPTY;
+	    return;
+	}
+	puts("Invalid option, please try again.");
     }
 }
 
@@ -95,19 +97,32 @@ static bool game_over(const State board[SIZE][SIZE], const State player){
 }
 
 static void user_move(Move* move) {
-    printf("\nMake a move (from to): ");
 
-    size_t start_row, end_row;
-    char char_start_col, char_end_col;
+	size_t start_row, end_row;
+	char char_start_col, char_end_col;
 
-    scanf(" %c%zu %c%zu", &char_start_col, &start_row, &char_end_col, &end_row);
+	putchar('\n');
+	while (true) {
+		printf("Make a move (from to): ");
 
-    size_t start_col = (size_t) (char_start_col - 'a'), end_col = (size_t) (char_end_col - 'a');
+		int rval = scanf(" %c%zu %c%zu", &char_start_col, &start_row, &char_end_col, &end_row);
 
-    move->start_row = start_row;
-    move->end_row = end_row;
-    move->start_col = start_col;
-    move->end_col = end_col;
+		if (rval == 4 &&
+		    'a' <= char_start_col && char_start_col < 'a' + SIZE &&
+		    'a' <= char_end_col && char_end_col < 'a'+ SIZE &&
+		    start_row < SIZE && end_row < SIZE) {
+			break;
+		}
+		puts("Invalid option, please try again.");
+	}
+
+	size_t start_col = (size_t) (char_start_col - 'a');
+	size_t end_col = (size_t) (char_end_col - 'a');
+
+	move->start_row = start_row;
+	move->end_row = end_row;
+	move->start_col = start_col;
+	move->end_col = end_col;
 }
 
 static int make_move(State board[SIZE][SIZE], const Move* move, const State color) {
@@ -210,6 +225,7 @@ int main(void){
 	State board[SIZE][SIZE];
 	initBoard(board);
 	printBoard(board);
+
     State user = getUser();
     if(user == BLACK){ // make it general
         user_black(board);
@@ -218,6 +234,9 @@ int main(void){
     Move move = {};
 
     while (true) {
+
+	printBoard(board);
+
         if (game_over(board, user)){
             puts("Computer won!");
             break;
@@ -227,11 +246,14 @@ int main(void){
             user_move(&move);
             int val = make_move(board, &move, user);
 
-            if (val == -1) {
-                printf("Invlid move\n");
-                continue;
-            } else break;
+            if (val == 1) break;
+
+        puts("Invalid move, please try again.");
         }
+
+	printBoard(board);
+
+	system("sleep 1");
 
         // Computer move
         int64_t score = computer_move(&move, board, !user);
@@ -242,14 +264,12 @@ int main(void){
         // thus, prohibiting us from board_copy(board, tmpboard)
         // and doing print_board here after computer_move.
 
-
         if (score == LOOSE) {
             puts("You won!");
             break;
         }
 
-        printBoard(board);
-        system("sleep 2");
+	make_move(board, &move, !user);
     }
     return 1;
 }
