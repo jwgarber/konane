@@ -82,6 +82,14 @@ static void user_black(State board[SIZE][SIZE]){
     }
 }
 
+static void computer_black(State board[SIZE][SIZE]) {
+	// make the corner move that we have above on a separate corner_board
+	// evaluate it with the negamax function and look at the score
+	// then make the middle move on a middle_board, and evaluate that with negamax too
+	// (for both use the DEPTH macro in konane.h)
+	// then compare the scores, and then board_copy(board, the_board_with_the_better_score)
+}
+
 static bool game_over(const State board[SIZE][SIZE], const State player){
     for(size_t i = 0; i < SIZE; ++i){
         for(size_t j = 0; j < SIZE; ++j){
@@ -222,21 +230,34 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
 }
 
 int main(void){
+	Move move = {};
 	State board[SIZE][SIZE];
 	initBoard(board);
 	printBoard(board);
 
-    State user = getUser();
-    if(user == BLACK){ // make it general
+    const State user = getUser();
+
+    if(user == BLACK){
         user_black(board);
+	printBoard(board);
     }
 
-    Move move = {};
+    if (user == WHITE) {
+	    computer_black(board);
 
-    while (true) {
+	    // The computer then makes a second move
+	int64_t score = computer_move(&move, board, !user);
+
+	make_move(board, &move, !user);
 
 	printBoard(board);
 
+	printf("Computer score = %li\n", score);
+    }
+
+    while (true) {
+
+	    // User move
         if (game_over(board, user)){
             puts("Computer won!");
             break;
@@ -257,12 +278,6 @@ int main(void){
 
         // Computer move
         int64_t score = computer_move(&move, board, !user);
-        // there is a small problem here: computer_move can
-        // neither print_baord nor board_copy.
-        // becasue play.c doesnt have access to print_board
-        // and in computer_move, board is passed as a const;
-        // thus, prohibiting us from board_copy(board, tmpboard)
-        // and doing print_board here after computer_move.
 
         if (score == LOOSE) {
             puts("You won!");
@@ -270,6 +285,10 @@ int main(void){
         }
 
 	make_move(board, &move, !user);
+
+	printBoard(board);
+
+	printf("Computer score = %li\n", score);
     }
     return 1;
 }

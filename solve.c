@@ -10,7 +10,7 @@ static void board_copy(State dst[SIZE][SIZE], const State src[SIZE][SIZE]) {
     }
 }
 
-int32_t negamax(const State board[SIZE][SIZE], const State player) {
+static int32_t negamax(const State board[SIZE][SIZE], const State player) {
 
     State newboard[SIZE][SIZE];
 

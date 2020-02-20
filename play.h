@@ -4,6 +4,7 @@
 
 #include "konane.h"
 
+int64_t negamax(const State board[SIZE][SIZE], const State color, const uint32_t depth);
 int64_t computer_move(Move* move, const State board[SIZE][SIZE], const State player);
 
 static inline void board_copy(State dst[SIZE][SIZE], const State src[SIZE][SIZE]) {

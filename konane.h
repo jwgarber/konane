@@ -12,6 +12,8 @@ typedef enum {
 #define WIN      (SIZE * SIZE)
 #define LOOSE    (-SIZE * SIZE)
 
+#define DEPTH   5
+
 typedef struct {
     size_t start_row;
     size_t start_col;
