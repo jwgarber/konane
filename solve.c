@@ -57,7 +57,7 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color) {
 
     State newboard[SIZE][SIZE];
 
-    int32_t score = LOOSE;
+    int32_t score = -10000;
 
     for (size_t i = 0; i < SIZE; ++i) {
         for (size_t j = 0; j < SIZE; ++j) {
@@ -75,9 +75,8 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color) {
 
                     int32_t val = -solve_negamax(newboard, !color);
 
-                    // If we have found a winning move, we don't need to do any more searching
-                    if (val == WIN)
-                        return WIN;
+                    if (val > score)
+			    score = val;
 
                 } else break;
             }
@@ -93,8 +92,8 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color) {
 
                     int32_t val = -solve_negamax(newboard, !color);
 
-                    if (val == WIN)
-                        return WIN;
+		if (val > score)
+			score = val;
 
                 } else break;
             }
@@ -110,8 +109,8 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color) {
 
                     int32_t val = -solve_negamax(newboard, !color);
 
-                    if (val == WIN)
-                        return WIN;
+		if (val > score)
+			score = val;
 
                 } else break;
             }
@@ -127,15 +126,15 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color) {
 
                     int32_t val = -solve_negamax(newboard, !color);
 
-                    if (val == WIN)
-                        return WIN;
+		if (val > score)
+			score = val;
 
                 } else break;
             }
         }
     }
 
-    if (score == LOOSE) {
+    if (score == -10000) {
 	    // We cannot make any moves, so the other player has won.
 	    // Count how many moves they have left, and that is the final score.
 	    score = -count_moves(board, !color);

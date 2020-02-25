@@ -3,7 +3,7 @@
 
 #include "play.h"
 
-// Winning is the best possible outcome, and losing is the worst possible
+// Winning is the best possible outcome, and losing is the worst possible.
 // It is impossible to be able to move to every single spot on a single turn,
 // so SIZE * SIZE will be greater than every possible score. Likewise,
 // - SIZE * SIZE will be less than any possible score, so we will use those
