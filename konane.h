@@ -6,13 +6,13 @@ typedef enum {
     EMPTY = 2,
 } State;
 
-/*#define SIZE  4*/
-#define SIZE    6
+//#define SIZE  4
+#define SIZE  6
 
 #define WIN      (SIZE * SIZE)
 #define LOOSE    (-SIZE * SIZE)
 
-#define DEPTH   5
+#define DEPTH   6
 
 typedef struct {
     size_t start_row;

@@ -129,8 +129,6 @@ static int user_move(Move* move) {
 	size_t start_row, end_row;
 	char char_start_col, char_end_col;
 
-	putchar('\n');
-
 	while (true) {
 		printf("Enter a command (hint, solve, or make a move): ");
 
@@ -143,7 +141,6 @@ static int user_move(Move* move) {
 			free(line);
 			return 1;
 		} else if (strcmp(line, "solve\n") == 0) {
-			puts("solve!");
 			free(line);
 			return 2;
 		} else if (sscanf(line, "%c%zu %c%zu", &char_start_col, &start_row, &char_end_col, &end_row) == 4) {
@@ -282,13 +279,13 @@ int main(void){
 	    computer_black(board);
 
 	    // The computer then makes a second move
-	int64_t score = computer_move(&move, board, !user);
+	int32_t score = computer_move(&move, board, !user);
 
 	make_move(board, &move, !user);
 
 	printBoard(board);
 
-	printf("Computer score = %li\n", score);
+	printf("Computer score = %i\n", score);
     }
 
     while (true) {
@@ -298,6 +295,8 @@ int main(void){
             puts("Computer won!");
             break;
         }
+
+	putchar('\n');
 
         while (true) {
             const int choice = user_move(&move);
@@ -311,8 +310,8 @@ int main(void){
 		    /*print_move(&move);*/
 	    } else if (choice == 2) {
 		    // solve
-		    // will implement this later
-		    return;
+		    const int32_t score = solve_negamax(board, user);
+		    printf("Solve score = %i\n", score);
 	    } else {
 
 		int val = make_move(board, &move, user);
@@ -325,10 +324,10 @@ int main(void){
 
 	printBoard(board);
 
-	system("sleep 1");
+	/*system("sleep 1");*/
 
         // Computer move
-        int64_t score = computer_move(&move, board, !user);
+        int32_t score = computer_move(&move, board, !user);
 
         if (score == LOOSE) {
             puts("You won!");
@@ -339,7 +338,7 @@ int main(void){
 
 	printBoard(board);
 
-	printf("Computer score = %li\n", score);
+	printf("Computer score = %i\n", score);
     }
-    return 1;
+    return EXIT_SUCCESS;
 }
