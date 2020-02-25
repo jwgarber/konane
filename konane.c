@@ -326,13 +326,13 @@ int main(void){
 
 	/*system("sleep 1");*/
 
+	if (game_over(board, !user)) {
+	    puts("You won!");
+	    break;
+	}
+
         // Computer move
         int32_t score = computer_move(&move, board, !user);
-
-        if (score == LOOSE) {
-            puts("You won!");
-            break;
-        }
 
 	make_move(board, &move, !user);
 

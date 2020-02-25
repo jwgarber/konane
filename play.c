@@ -201,7 +201,7 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                     int32_t val = -negamax(tmpboard, !color, depth - 1);
 
                     // If this move is better than the current best, then record that move
-                    if (val > score) {
+                    if (val >= score) {
                         score = val;
 
                         move->start_row = i;
@@ -224,7 +224,7 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
 
                     int32_t val = -negamax(tmpboard, !color, depth - 1);
 
-                    if (val > score) {
+                    if (val >= score) {
                         score = val;
 
                         move->start_row = i;
@@ -247,7 +247,7 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
 
                     int32_t val = -negamax(tmpboard, !color, depth - 1);
 
-                    if (val > score) {
+                    if (val >= score) {
                         score = val;
 
                         move->start_row = i;
@@ -270,7 +270,7 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
 
                     int32_t val = -negamax(tmpboard, !color, depth - 1);
 
-                    if (val > score) {
+                    if (val >= score) {
                         score = val;
 
                         move->start_row = i;
@@ -284,6 +284,5 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
         }
     }
 
-    // If there is no move to make, then the score will be LOOSE.
     return score;
 }
