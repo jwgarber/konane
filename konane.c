@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "konane.h"
 #include "solve.h"
@@ -48,41 +49,56 @@ static void printBoard(const State board[SIZE][SIZE]){
 }
 
 static State getUser(void){
-    char user;
     putchar('\n');
     while (true) {
 	printf("Do you want to play black or white? (b/w): ");
-	scanf("%s", &user);
-	if(user == 'b'){
+
+	    char* line = NULL;
+	    size_t len = 0;
+	getline(&line, &len, stdin);
+
+	if(strcmp(line, "b\n") == 0) {
+		free(line);
 	    return BLACK;
 	}
-	if(user == 'w'){
+	if(strcmp(line, "w\n") == 0){
+		free(line);
 	    return WHITE;
 	}
+
 	puts("Invalid option, please try again.");
+	free(line);
     }
 }
 
 static void user_black(State board[SIZE][SIZE]){
-    char start_move;
     while (true) {
 	printf("Do you want to remove from the middle or corner? (m/c): ");
-	scanf("%s", &start_move);
-	if(start_move == 'm'){
+
+	char* line = NULL;
+	size_t len = 0;
+	getline(&line, &len, stdin);
+
+	if(strcmp(line, "m\n") == 0){
 	    board[-1 + SIZE/2][-1 + SIZE/2] = EMPTY;
 	    board[-1 + SIZE/2][SIZE/2] = EMPTY;
+	    free(line);
 	    return;
 	}
-	if(start_move == 'c'){
+
+	if(strcmp(line, "c\n") == 0){
 	    board[0][0] = EMPTY;
 	    board[0][1] = EMPTY;
+	    free(line);
 	    return;
 	}
 	puts("Invalid option, please try again.");
+	free(line);
     }
 }
 
 static void computer_black(State board[SIZE][SIZE]) {
+	// TODO
 	// make the corner move that we have above on a separate corner_board
 	// evaluate it with the negamax function and look at the score
 	// then make the middle move on a middle_board, and evaluate that with negamax too
@@ -104,33 +120,53 @@ static bool game_over(const State board[SIZE][SIZE], const State player){
     return true;
 }
 
-static void user_move(Move* move) {
+// The return value indicates what input the user made
+// 1 for hint
+// 2 for solve
+// 3 for making a move
+static int user_move(Move* move) {
 
 	size_t start_row, end_row;
 	char char_start_col, char_end_col;
 
 	putchar('\n');
+
 	while (true) {
-		printf("Make a move (from to): ");
+		printf("Enter a command (hint, solve, or make a move): ");
 
-		int rval = scanf(" %c%zu %c%zu", &char_start_col, &start_row, &char_end_col, &end_row);
+		char* line = NULL;
+		size_t len = 0;
+		getline(&line, &len, stdin);
 
-		if (rval == 4 &&
-		    'a' <= char_start_col && char_start_col < 'a' + SIZE &&
-		    'a' <= char_end_col && char_end_col < 'a'+ SIZE &&
-		    start_row < SIZE && end_row < SIZE) {
-			break;
+		if (strcmp(line, "hint\n") == 0) {
+			puts("hint!");
+			free(line);
+			return 1;
+		} else if (strcmp(line, "solve\n") == 0) {
+			puts("solve!");
+			free(line);
+			return 2;
+		} else if (sscanf(line, "%c%zu %c%zu", &char_start_col, &start_row, &char_end_col, &end_row) == 4) {
+
+			if ('a' <= char_start_col && char_start_col < 'a' + SIZE &&
+			    'a' <= char_end_col && char_end_col < 'a'+ SIZE &&
+			    start_row < SIZE && end_row < SIZE) {
+
+				size_t start_col = (size_t) (char_start_col - 'a');
+				size_t end_col = (size_t) (char_end_col - 'a');
+
+				move->start_row = start_row;
+				move->end_row = end_row;
+				move->start_col = start_col;
+				move->end_col = end_col;
+				free(line);
+				return 3;
+			}
 		}
+
 		puts("Invalid option, please try again.");
+		free(line);
 	}
-
-	size_t start_col = (size_t) (char_start_col - 'a');
-	size_t end_col = (size_t) (char_end_col - 'a');
-
-	move->start_row = start_row;
-	move->end_row = end_row;
-	move->start_col = start_col;
-	move->end_col = end_col;
 }
 
 static int make_move(State board[SIZE][SIZE], const Move* move, const State color) {
@@ -264,12 +300,27 @@ int main(void){
         }
 
         while (true) {
-            user_move(&move);
-            int val = make_move(board, &move, user);
+            const int choice = user_move(&move);
+	    if (choice == 1) {
+		    // hint
+		    // here the computer suggests the next move to make
+		    computer_move(&move, board, user);
+		    // Now we print the suggested move to the user
+		    // so convert the coordinates back to the input the user reads
+		    // TODO
+		    /*print_move(&move);*/
+	    } else if (choice == 2) {
+		    // solve
+		    // will implement this later
+		    return;
+	    } else {
 
-            if (val == 1) break;
+		int val = make_move(board, &move, user);
 
-        puts("Invalid move, please try again.");
+		if (val == 1) break;
+
+		puts("Invalid move, please try again.");
+	    }
         }
 
 	printBoard(board);
