@@ -2,14 +2,6 @@
 
 #include "solve.h"
 
-static void board_copy(State dst[SIZE][SIZE], const State src[SIZE][SIZE]) {
-    for (size_t i = 0; i < SIZE; ++i) {
-        for (size_t j = 0; j < SIZE; ++j) {
-            dst[i][j] = src[i][j];
-        }
-    }
-}
-
 // Count the number of moves for this player.
 static int32_t count_moves(const State board[SIZE][SIZE], const State color) {
 
@@ -53,11 +45,17 @@ static int32_t count_moves(const State board[SIZE][SIZE], const State color) {
     return count;
 }
 
+// alpha is the current lower bound on my possible score (eg. -oo)
+// beta is the current upper bound on my possible score (eg. +oo)
+// the other player is going to minimize my best scores. If one of my
+// possible moves is better than a choice the opponent can already pick,
+// they won't pick this move, so bail out early.
+
 int32_t solve_negamax(const State board[SIZE][SIZE], const State color) {
 
     State newboard[SIZE][SIZE];
 
-    int32_t score = -10000;
+    int32_t score = LOOSE;
 
     for (size_t i = 0; i < SIZE; ++i) {
         for (size_t j = 0; j < SIZE; ++j) {
@@ -134,7 +132,7 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color) {
         }
     }
 
-    if (score == -10000) {
+    if (score == LOOSE) {
 	    // We cannot make any moves, so the other player has won.
 	    // Count how many moves they have left, and that is the final score.
 	    score = -count_moves(board, !color);
