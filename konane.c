@@ -141,7 +141,7 @@ static int user_move(Move* move) {
 	putchar('\n');
 
 	while (true) {
-		printf("Enter a command (hint, solve) or make a move: ");
+		printf("Enter a command (hint, solve, quit) or make a move: ");
 
 		char* line = NULL;
 		size_t len = 0;
@@ -155,7 +155,11 @@ static int user_move(Move* move) {
 			puts("solve!");
 			free(line);
 			return 2;
-		} else if (sscanf(line, "%c%zu %c%zu", &char_start_col, &start_row, &char_end_col, &end_row) == 4) {
+		} else if (strcmp(line, "quit\n") == 0){
+            puts("You quit!");
+            free(line);
+            return 3;
+        } else if (sscanf(line, "%c%zu %c%zu", &char_start_col, &start_row, &char_end_col, &end_row) == 4) {
 
 			if ('a' <= char_start_col && char_start_col < 'a' + SIZE &&
 			    'a' <= char_end_col && char_end_col < 'a'+ SIZE &&
@@ -169,7 +173,7 @@ static int user_move(Move* move) {
 				move->start_col = start_col;
 				move->end_col = end_col;
 				free(line);
-				return 3;
+				return 4;
 			}
 		}
 		puts("Invalid option, please try again.");
@@ -321,6 +325,8 @@ int main(void){
                 // solve
                 // // will implement this later
                 // return 1;
+            } else if (choice == 3) {
+                exit(0);
             } else {
 
                 int val = make_move(board, &move, user);
