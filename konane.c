@@ -27,7 +27,7 @@ static void initBoard(State board[SIZE][SIZE]){
 
 static void printBoard(const State board[SIZE][SIZE]){
     system("clear");
-    printf(" ");
+    printf("\n ");
     for(int i = 'a'; i < 'a' + SIZE; i++){
         printf(" %c", i);
     }
@@ -172,10 +172,16 @@ static int user_move(Move* move) {
 				return 3;
 			}
 		}
-
 		puts("Invalid option, please try again.");
 		free(line);
 	}
+}
+
+static void print_move(const Move* move){
+    char start_col, end_col;
+    start_col = 'a' + (char) move->start_col;
+    end_col = 'a' + (char) move->end_col;
+    printf("%c%zu %c%zu\n", start_col, move->start_row, end_col, move->end_row);
 }
 
 static int make_move(State board[SIZE][SIZE], const Move* move, const State color) {
@@ -288,7 +294,7 @@ int main(void){
     }
 
     if (user == WHITE) {
-	    computer_black(board);
+        computer_black(board);
         printBoard(board);
 
 	    // The computer then makes a second move
@@ -308,31 +314,27 @@ int main(void){
 
         while (true) {
             const int choice = user_move(&move);
-	    if (choice == 1) {
-		    // hint
-		    // here the computer suggests the next move to make
-		    computer_move(&move, board, user);
-		    // Now we print the suggested move to the user
-		    // so convert the coordinates back to the input the user reads
-		    // TODO
-		    /*print_move(&move);*/
-	    } else if (choice == 2) {
-		    // solve
-		    // will implement this later
-		    return 1;
-	    } else {
+            if (choice == 1) {
+                computer_move(&move, board, user);
+                print_move(&move);
+            } else if (choice == 2) {
+                // solve
+                // // will implement this later
+                // return 1;
+            } else {
 
-		int val = make_move(board, &move, user);
+                int val = make_move(board, &move, user);
 
-		if (val == 1) break;
+                if (val == 1) break;
 
-		puts("Invalid move, please try again.");
-	    }
+                puts("Invalid move, please try again.");
+
+            }
         }
 
-	printBoard(board);
+        printBoard(board);
 
-	system("sleep 1");
+        system("sleep 1");
 
         // Computer move
         int64_t score = computer_move(&move, board, !user);
@@ -342,11 +344,9 @@ int main(void){
             break;
         }
 
-	make_move(board, &move, !user);
-
-	printBoard(board);
-
-	printf("Computer score = %lli\n", score);
+        make_move(board, &move, !user);
+        printBoard(board);
+        printf("Computer score = %lli\n", score);
     }
     return 1;
 }
