@@ -63,7 +63,7 @@ static State getUser(void){
 	}
 	if(strcmp(line, "w\n") == 0){
 		free(line);
-	    return WHITE;
+        return WHITE;
 	}
 
 	puts("Invalid option, please try again.");
@@ -98,12 +98,21 @@ static void user_black(State board[SIZE][SIZE]){
 }
 
 static void computer_black(State board[SIZE][SIZE]) {
-	// TODO
-	// make the corner move that we have above on a separate corner_board
-	// evaluate it with the negamax function and look at the score
-	// then make the middle move on a middle_board, and evaluate that with negamax too
-	// (for both use the DEPTH macro in konane.h)
-	// then compare the scores, and then board_copy(board, the_board_with_the_better_score)
+    State corn_board[SIZE][SIZE], mid_board[SIZE][SIZE];
+    board_copy(corn_board, board);
+    board_copy(mid_board, board);
+
+    corn_board[0][0] = EMPTY;
+    corn_board[0][1] = EMPTY;
+
+    mid_board[-1 + SIZE/2][-1 + SIZE/2] = EMPTY;
+    mid_board[-1 + SIZE/2][SIZE/2] = EMPTY;
+
+    int64_t corn_score = negamax(corn_board, BLACK, DEPTH);
+    int64_t mid_score = negamax(mid_board, BLACK, DEPTH);
+
+    if(corn_score > mid_score) board_copy(board, corn_board);
+    else board_copy(board, mid_board);
 }
 
 static bool game_over(const State board[SIZE][SIZE], const State player){
@@ -132,7 +141,7 @@ static int user_move(Move* move) {
 	putchar('\n');
 
 	while (true) {
-		printf("Enter a command (hint, solve, or make a move): ");
+		printf("Enter a command (hint, solve) or make a move: ");
 
 		char* line = NULL;
 		size_t len = 0;
@@ -275,20 +284,18 @@ int main(void){
 
     if(user == BLACK){
         user_black(board);
-	printBoard(board);
+        printBoard(board);
     }
 
     if (user == WHITE) {
 	    computer_black(board);
+        printBoard(board);
 
 	    // The computer then makes a second move
-	int64_t score = computer_move(&move, board, !user);
-
-	make_move(board, &move, !user);
-
-	printBoard(board);
-
-	printf("Computer score = %li\n", score);
+        int64_t score = computer_move(&move, board, !user);
+        make_move(board, &move, !user);
+        printBoard(board);
+        printf("Computer score = %lli\n", score);
     }
 
     while (true) {
@@ -312,7 +319,7 @@ int main(void){
 	    } else if (choice == 2) {
 		    // solve
 		    // will implement this later
-		    return;
+		    return 1;
 	    } else {
 
 		int val = make_move(board, &move, user);
@@ -339,7 +346,7 @@ int main(void){
 
 	printBoard(board);
 
-	printf("Computer score = %li\n", score);
+	printf("Computer score = %lli\n", score);
     }
     return 1;
 }
