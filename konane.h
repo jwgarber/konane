@@ -17,7 +17,7 @@ typedef enum {
 // to move, they must have at least one of their stones on the board, so the
 // maximum number of possible moves is strictly less than SIZE^2.
 #define WIN      (SIZE * SIZE)
-#define LOOSE    (-SIZE * SIZE)
+#define LOSE    (-SIZE * SIZE)
 
 #define DEPTH   6
 

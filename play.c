@@ -68,12 +68,12 @@ static int32_t evaluate_board(const State board[SIZE][SIZE], const State color) 
 
     if (color == BLACK && black == 0) {
         // Black to play, but black has no moves, so black looses
-        return LOOSE;
+        return LOSE;
     }
 
     if (color == WHITE && white == 0) {
         // Ditto for white
-        return LOOSE;
+        return LOSE;
     }
 
     switch (color) {
@@ -96,7 +96,7 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int
     // This will also catch terminal nodes, because there will be no moves to make
     State tmpboard[SIZE][SIZE];
 
-    int32_t score = LOOSE;
+    int32_t score = LOSE;
 
     for (size_t i = 0; i < SIZE; ++i) {
         for (size_t j = 0; j < SIZE; ++j) {
@@ -196,11 +196,11 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
 
     State tmpboard[SIZE][SIZE];
 
-    int32_t score = LOOSE;
+    int32_t score = LOSE;
 
     uint32_t depth = DEPTH;
 
-    int32_t a = LOOSE, b = WIN;
+    int32_t a = LOSE, b = WIN;
 
     for (size_t i = 0; i < SIZE; ++i) {
         for (size_t j = 0; j < SIZE; ++j) {

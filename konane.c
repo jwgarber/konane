@@ -108,8 +108,8 @@ static void computer_black(State board[SIZE][SIZE]) {
     mid_board[-1 + SIZE/2][-1 + SIZE/2] = EMPTY;
     mid_board[-1 + SIZE/2][SIZE/2] = EMPTY;
 
-    int32_t corn_score = negamax(corn_board, BLACK, LOOSE, WIN, DEPTH);
-    int32_t mid_score = negamax(mid_board, BLACK, LOOSE, WIN, DEPTH);
+    int32_t corn_score = negamax(corn_board, BLACK, LOSE, WIN, DEPTH);
+    int32_t mid_score = negamax(mid_board, BLACK, LOSE, WIN, DEPTH);
 
     if(corn_score > mid_score) board_copy(board, corn_board);
     else board_copy(board, mid_board);
