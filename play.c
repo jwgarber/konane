@@ -86,7 +86,7 @@ static int32_t evaluate_board(const State board[SIZE][SIZE], const State color) 
     }
 }
 
-int32_t negamax(const State board[SIZE][SIZE], const State color, const uint32_t depth) {
+int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int32_t b, const uint32_t depth) {
 
     if (depth == 0) {
         return evaluate_board(board, color);
@@ -112,10 +112,14 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, const uint32_t
                     tmpboard[k - 1][j] = EMPTY;
                     tmpboard[k - 2][j] = color;
 
-                    int32_t val = -negamax(tmpboard, !color, depth - 1);
+                    int32_t val = -negamax(tmpboard, !color, -b, -a, depth - 1);
 
                     if (val > score)
                         score = val;
+                    if (score > a)
+                        a = score;
+                    if (a >= b)
+                        return score;
 
                 } else break;
             }
@@ -129,10 +133,14 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, const uint32_t
                     tmpboard[i][k + 1] = EMPTY;
                     tmpboard[i][k + 2] = color;
 
-                    int32_t val = -negamax(tmpboard, !color, depth - 1);
+                    int32_t val = -negamax(tmpboard, !color, -b, -a, depth - 1);
 
                     if (val > score)
                         score = val;
+                    if (score > a)
+                        a = score;
+                    if (a >= b)
+                        return score;
 
                 } else break;
             }
@@ -146,10 +154,14 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, const uint32_t
                     tmpboard[i][k - 1] = EMPTY;
                     tmpboard[i][k - 2] = color;
 
-                    int32_t val = -negamax(tmpboard, !color, depth - 1);
+                    int32_t val = -negamax(tmpboard, !color, -b, -a, depth - 1);
 
                     if (val > score)
                         score = val;
+                    if (score > a)
+                        a = score;
+                    if (a >= b)
+                        return score;
 
                 } else break;
             }
@@ -163,10 +175,14 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, const uint32_t
                     tmpboard[k + 1][j] = EMPTY;
                     tmpboard[k + 2][j] = color;
 
-                    int32_t val = -negamax(tmpboard, !color, depth - 1);
+                    int32_t val = -negamax(tmpboard, !color, -b, -a, depth - 1);
 
                     if (val > score)
                         score = val;
+                    if (score > a)
+                        a = score;
+                    if (a >= b)
+                        return score;
 
                 } else break;
             }
@@ -184,6 +200,8 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
 
     uint32_t depth = DEPTH;
 
+    int32_t a = LOOSE, b = WIN;
+
     for (size_t i = 0; i < SIZE; ++i) {
         for (size_t j = 0; j < SIZE; ++j) {
 
@@ -198,7 +216,7 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                     tmpboard[k - 1][j] = EMPTY;
                     tmpboard[k - 2][j] = color;
 
-                    int32_t val = -negamax(tmpboard, !color, depth - 1);
+                    int32_t val = -negamax(tmpboard, !color, -b, -a, depth - 1);
 
                     // If this move is better than the current best, then record that move
                     if (val >= score) {
@@ -209,6 +227,11 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                         move->end_row = k - 2;
                         move->end_col = j;
                     }
+
+                    if (score > a)
+                        a = score;
+                    if (a >= b)
+                        return score;
 
                 } else break;
             }
@@ -222,7 +245,7 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                     tmpboard[i][k + 1] = EMPTY;
                     tmpboard[i][k + 2] = color;
 
-                    int32_t val = -negamax(tmpboard, !color, depth - 1);
+                    int32_t val = -negamax(tmpboard, !color, -b, -a, depth - 1);
 
                     if (val >= score) {
                         score = val;
@@ -232,6 +255,11 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                         move->end_row = i;
                         move->end_col = k + 2;
                     }
+
+                    if (score > a)
+                        a = score;
+                    if (a >= b)
+                        return score;
 
                 } else break;
             }
@@ -245,7 +273,7 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                     tmpboard[i][k - 1] = EMPTY;
                     tmpboard[i][k - 2] = color;
 
-                    int32_t val = -negamax(tmpboard, !color, depth - 1);
+                    int32_t val = -negamax(tmpboard, !color, -b, -a, depth - 1);
 
                     if (val >= score) {
                         score = val;
@@ -255,6 +283,11 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                         move->end_row = i;
                         move->end_col = k - 2;
                     }
+
+                    if (score > a)
+                        a = score;
+                    if (a >= b)
+                        return score;
 
                 } else break;
             }
@@ -268,7 +301,7 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                     tmpboard[k + 1][j] = EMPTY;
                     tmpboard[k + 2][j] = color;
 
-                    int32_t val = -negamax(tmpboard, !color, depth - 1);
+                    int32_t val = -negamax(tmpboard, !color, -b, -a, depth - 1);
 
                     if (val >= score) {
                         score = val;
@@ -278,6 +311,11 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                         move->end_row = k + 2;
                         move->end_col = j;
                     }
+
+                    if (score > a)
+                        a = score;
+                    if (a >= b)
+                        return score;
 
                 } else break;
             }
