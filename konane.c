@@ -136,25 +136,28 @@ static bool game_over(const State board[SIZE][SIZE], const State player){
 // 1 for hint
 // 2 for solve
 // 3 for making a move
-static int user_move(Move* move) {
+static int user_move(Move* move, uint32_t *depth) {
 
 	size_t start_row, end_row;
 	char char_start_col, char_end_col;
 
 	while (true) {
-		printf("Enter a command (hint, solve, quit) or make a move: ");
+		printf("Enter a command for hint, solve, quit (h / s / q) or make a move: ");
 
 		char* line = NULL;
 		size_t len = 0;
 		getline(&line, &len, stdin);
 
-		if (strcmp(line, "hint\n") == 0) {
-			free(line);
+		if (sscanf(line, "hint %u\n", depth) == 1 || sscanf(line,"h %u\n", depth) == 1){
+            free(line);
 			return 1;
-		} else if (strcmp(line, "solve\n") == 0) {
+        } else if (strcmp(line, "hint\n") == 0 || strcmp(line, "h\n") == 0) {
+            free(line);
+            return 1;
+		} else if (strcmp(line, "solve\n") == 0 || strcmp(line, "s\n") == 0) {
 			free(line);
 			return 2;
-		} else if (strcmp(line, "quit\n") == 0){
+		} else if (strcmp(line, "quit\n") == 0 || strcmp(line, "q\n") == 0){
             puts("You quit!");
             free(line);
             return 3;
@@ -327,8 +330,10 @@ int main(void){
 	putchar('\n');
 
         while (true) {
-            const int choice = user_move(&move);
+            uint32_t depth = DEPTH;
+            const int choice = user_move(&move, &depth);
             if (choice == 1) {
+                // hint
                 computer_move(&move, board, user);
                 print_move(&move);
             } else if (choice == 2) {
