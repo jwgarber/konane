@@ -33,7 +33,7 @@ static void printBoard(const State board[SIZE][SIZE]){
     }
     printf("\n");
     for(int i = 0; i < SIZE; i++){
-		printf("%d", i);
+		printf(" %d", i);
         for(int j = 0; j < SIZE; j++){
             switch(board[i][j]){
                 case BLACK:
@@ -325,8 +325,12 @@ int main(void){
             } else if (choice == 2) {
                 // solve
                 // // will implement this later
-                const int32_t score = solve_negamax(board, user);
+                const int32_t score = solve_negamax(board, user, LOSE, WIN);
                 printf("Solve score = %i\n", score);
+                // print the moves made in solve
+                // ^ make a list.
+
+
             } else if (choice == 3) {
                 exit(0);
             } else {

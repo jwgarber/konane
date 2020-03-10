@@ -51,7 +51,7 @@ static int32_t count_moves(const State board[SIZE][SIZE], const State color) {
 // possible moves is better than a choice the opponent can already pick,
 // they won't pick this move, so bail out early.
 
-int32_t solve_negamax(const State board[SIZE][SIZE], const State color) {
+int32_t solve_negamax(const State board[SIZE][SIZE], const State color, int32_t a, int32_t b) {
 
     State newboard[SIZE][SIZE];
 
@@ -71,10 +71,14 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color) {
                     newboard[k - 1][j] = EMPTY;
                     newboard[k - 2][j] = color;
 
-                    int32_t val = -solve_negamax(newboard, !color);
+                    int32_t val = -solve_negamax(newboard, !color, -b, -a);
 
                     if (val > score)
-			    score = val;
+                        score = val;
+                    if (score > a)
+                        a = score;
+                    if (a >=b)
+                        return score;
 
                 } else break;
             }
@@ -88,11 +92,14 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color) {
                     newboard[i][k + 1] = EMPTY;
                     newboard[i][k + 2] = color;
 
-                    int32_t val = -solve_negamax(newboard, !color);
+                    int32_t val = -solve_negamax(newboard, !color, -b, -a);
 
-		if (val > score)
-			score = val;
-
+                    if (val > score)
+                        score = val;
+                    if (score > a)
+                        a = score;
+                    if (a >=b)
+                        return score;
                 } else break;
             }
 
@@ -105,11 +112,14 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color) {
                     newboard[i][k - 1] = EMPTY;
                     newboard[i][k - 2] = color;
 
-                    int32_t val = -solve_negamax(newboard, !color);
+                    int32_t val = -solve_negamax(newboard, !color, -b, -a);
 
-		if (val > score)
-			score = val;
-
+                    if (val > score)
+                        score = val;
+                    if (score > a)
+                        a = score;
+                    if (a >=b)
+                        return score;
                 } else break;
             }
 
@@ -122,11 +132,14 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color) {
                     newboard[k + 1][j] = EMPTY;
                     newboard[k + 2][j] = color;
 
-                    int32_t val = -solve_negamax(newboard, !color);
+                    int32_t val = -solve_negamax(newboard, !color, -b, -a);
 
-		if (val > score)
-			score = val;
-
+                    if (val > score)
+                        score = val;
+                    if (score > a)
+                        a = score;
+                    if (a >=b)
+                        return score;
                 } else break;
             }
         }

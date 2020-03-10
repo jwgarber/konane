@@ -9,7 +9,7 @@ typedef enum {
 } State;
 
 //#define SIZE  4
-#define SIZE  8
+#define SIZE  4
 
 // The number of possible moves a player can make is bounded above by the
 // number of opponent stones on the board, since each jump captures an opponent
@@ -19,7 +19,7 @@ typedef enum {
 #define WIN      (SIZE * SIZE)
 #define LOOSE    (-SIZE * SIZE)
 
-#define DEPTH   6
+#define DEPTH	6
 
 typedef struct {
     size_t start_row;
