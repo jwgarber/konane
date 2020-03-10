@@ -9,7 +9,7 @@ typedef enum {
 } State;
 
 //#define SIZE  4
-#define SIZE  4
+#define SIZE  6
 
 // The number of possible moves a player can make is bounded above by the
 // number of opponent stones on the board, since each jump captures an opponent

@@ -1,4 +1,6 @@
 #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 
 #include "solve.h"
 
@@ -51,7 +53,7 @@ static int32_t count_moves(const State board[SIZE][SIZE], const State color) {
 // possible moves is better than a choice the opponent can already pick,
 // they won't pick this move, so bail out early.
 
-int32_t solve_negamax(const State board[SIZE][SIZE], const State color, int32_t a, int32_t b) {
+static int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int32_t b) {
 
     State newboard[SIZE][SIZE];
 
@@ -71,7 +73,7 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color, int32_t 
                     newboard[k - 1][j] = EMPTY;
                     newboard[k - 2][j] = color;
 
-                    int32_t val = -solve_negamax(newboard, !color, -b, -a);
+                    int32_t val = -negamax(newboard, !color, -b, -a);
 
                     if (val > score)
                         score = val;
@@ -92,7 +94,7 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color, int32_t 
                     newboard[i][k + 1] = EMPTY;
                     newboard[i][k + 2] = color;
 
-                    int32_t val = -solve_negamax(newboard, !color, -b, -a);
+                    int32_t val = -negamax(newboard, !color, -b, -a);
 
                     if (val > score)
                         score = val;
@@ -112,7 +114,7 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color, int32_t 
                     newboard[i][k - 1] = EMPTY;
                     newboard[i][k - 2] = color;
 
-                    int32_t val = -solve_negamax(newboard, !color, -b, -a);
+                    int32_t val = -negamax(newboard, !color, -b, -a);
 
                     if (val > score)
                         score = val;
@@ -132,7 +134,7 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color, int32_t 
                     newboard[k + 1][j] = EMPTY;
                     newboard[k + 2][j] = color;
 
-                    int32_t val = -solve_negamax(newboard, !color, -b, -a);
+                    int32_t val = -negamax(newboard, !color, -b, -a);
 
                     if (val > score)
                         score = val;
@@ -152,4 +154,12 @@ int32_t solve_negamax(const State board[SIZE][SIZE], const State color, int32_t 
     }
 
     return score;
+}
+
+void solve(const State board[SIZE][SIZE], const State color) {
+
+    const int32_t score = negamax(board, color, LOSE, WIN);
+    printf("Solve score = %i\n", score);
+    // print the moves made in solve
+    // ^ make a list.
 }

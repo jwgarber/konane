@@ -1,8 +1,11 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "konane.h"
 #include "solve.h"
@@ -281,8 +284,14 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
 }
 
 int main(void){
+
 	Move move = {};
 	State board[SIZE][SIZE];
+
+    struct sigaction action;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+
 	initBoard(board);
 	printBoard(board);
 
@@ -323,16 +332,44 @@ int main(void){
                 computer_move(&move, board, user);
                 print_move(&move);
             } else if (choice == 2) {
-                // solve
-                // // will implement this later
-                const int32_t score = solve_negamax(board, user, LOSE, WIN);
-                printf("Solve score = %i\n", score);
-                // print the moves made in solve
-                // ^ make a list.
 
+                const pid_t pid = fork();
+                if (pid == -1) {
+                    perror("fork");
+                    exit(EXIT_FAILURE);
+                } else if (pid == 0) {
+                    solve(board, user);
+                    return EXIT_SUCCESS;
+                } else {
+
+                    // Ignore SIGINT for now
+                    action.sa_handler = SIG_IGN;
+                    if (sigaction(SIGINT, &action, NULL) == -1) {
+                        perror("sigaction");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    // Wait for the child to terminate
+                    int status;
+                    if (wait(&status) == -1) {
+                        perror("wait");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    if (!WIFEXITED(status)) {
+                        puts(" cancelled");
+                    }
+
+                    // Now restore it again
+                    action.sa_handler = SIG_DFL;
+                    if (sigaction(SIGINT, &action, NULL) == -1) {
+                        perror("sigaction");
+                        exit(EXIT_FAILURE);
+                    }
+                }
 
             } else if (choice == 3) {
-                exit(0);
+                exit(EXIT_SUCCESS);
             } else {
 
                 int val = make_move(board, &move, user);
