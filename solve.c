@@ -158,6 +158,7 @@ static int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t
 
 void solve(const State board[SIZE][SIZE], const State color) {
 
+    puts("Solving, type ^C to cancel");
     const int32_t score = negamax(board, color, LOSE, WIN);
     printf("Solve score = %i\n", score);
     // print the moves made in solve
