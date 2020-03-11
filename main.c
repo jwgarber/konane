@@ -13,6 +13,7 @@
 
 // TODO change the white/black names
 // solve from the command line, and optimize (eg. smaller moves, smaller boards)
+//   benchmark, and use this to solve 5x5 and 6x6
 // be able to set the computer depth
 // set the size in the makefile, and have different sized boards
 //   this depends on being able to play from anywhere
@@ -336,7 +337,10 @@ int main(void){
 
 	printBoard(board);
 
-	printf("Computer score = %i\n", score);
+    printf("\n Computer move = ");
+    print_move(&move);
+
+    print_score(" Computer", score);
     }
 
     while (true) {
