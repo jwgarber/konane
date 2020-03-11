@@ -30,7 +30,7 @@ static void initBoard(State board[SIZE][SIZE]){
 
 static void printBoard(const State board[SIZE][SIZE]){
     system("clear");
-    printf("\n ");
+    printf("\n  ");
     for(int i = 'a'; i < 'a' + SIZE; i++){
         printf(" %c", i);
     }
@@ -48,6 +48,17 @@ static void printBoard(const State board[SIZE][SIZE]){
             }
         }
         printf("\n");
+    }
+}
+
+static void print_score(const char* str, const int32_t score) {
+
+    if (score == WIN) {
+        printf("%s score = WIN\n", str);
+    } else if (score == LOSE) {
+        printf("%s score = LOSE\n", str);
+    } else {
+        printf("%s score = %i\n", str, score);
     }
 }
 
@@ -135,7 +146,8 @@ static bool game_over(const State board[SIZE][SIZE], const State player){
 // The return value indicates what input the user made
 // 1 for hint
 // 2 for solve
-// 3 for making a move
+// 3 for quit
+// 4 for making a move
 static int user_move(Move* move, uint32_t *depth) {
 
 	size_t start_row, end_row;
@@ -158,7 +170,6 @@ static int user_move(Move* move, uint32_t *depth) {
 			free(line);
 			return 2;
 		} else if (strcmp(line, "quit\n") == 0 || strcmp(line, "q\n") == 0){
-            puts("You quit!");
             free(line);
             return 3;
         } else if (sscanf(line, "%c%zu %c%zu", &char_start_col, &start_row, &char_end_col, &end_row) == 4) {
@@ -332,12 +343,49 @@ int main(void){
         while (true) {
             uint32_t depth = DEPTH;
             const int choice = user_move(&move, &depth);
+
             if (choice == 1) {
                 // hint
-                computer_move(&move, board, user, depth);
-                print_move(&move);
-                printf("Use this hint? y/n\n");
+
+                const pid_t pid = fork();
+                if (pid == -1) {
+                    perror("fork");
+                    exit(EXIT_FAILURE);
+                } else if (pid == 0) {
+                    int32_t score = computer_move(&move, board, user, depth);
+                    print_move(&move);
+                    print_score("User", score);
+                    /*printf("Use this hint? y/n\n");*/
+                    return EXIT_SUCCESS;
+                } else {
+
+                    // Ignore SIGINT for now
+                    action.sa_handler = SIG_IGN;
+                    if (sigaction(SIGINT, &action, NULL) == -1) {
+                        perror("sigaction");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    // Wait for the child to terminate
+                    int status;
+                    if (wait(&status) == -1) {
+                        perror("wait");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    if (!WIFEXITED(status)) {
+                        puts(" cancelled");
+                    }
+
+                    // Now restore it again
+                    action.sa_handler = SIG_DFL;
+                    if (sigaction(SIGINT, &action, NULL) == -1) {
+                        perror("sigaction");
+                        exit(EXIT_FAILURE);
+                    }
+                }
             } else if (choice == 2) {
+                // solve
 
                 const pid_t pid = fork();
                 if (pid == -1) {
@@ -375,8 +423,10 @@ int main(void){
                 }
 
             } else if (choice == 3) {
+                // quit
                 exit(EXIT_SUCCESS);
             } else {
+                // move
 
                 int val = make_move(board, &move, user);
 
@@ -403,7 +453,11 @@ int main(void){
 
 	printBoard(board);
 
-	printf("Computer score = %i\n", score);
+    // Add extra space for computer
+    printf("\n Computer move = ");
+    print_move(&move);
+
+    print_score(" Computer", score);
     }
     return EXIT_SUCCESS;
 }

@@ -1,0 +1,65 @@
+---
+Language: Cpp
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlinesLeft: false
+AlignOperands: true
+AlignTrailingComments: true
+
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Always
+AllowShortLoopsOnASingleLine: true
+
+AlwaysBreakAfterReturnType: None
+
+BinPackArguments: true
+BinPackParameters: true
+
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: Attach
+BreakBeforeTernaryOperators: true
+BreakStringLiterals: false
+
+ColumnLimit: 0
+ContinuationIndentWidth: 4
+
+IndentCaseLabels: false
+IndentWidth: 4
+IndentWrappedFunctionNames: false
+
+KeepEmptyLinesAtTheStartOfBlocks: true
+
+MaxEmptyLinesToKeep: 1
+
+ReflowComments: false
+
+SpaceAfterCStyleCast: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
+#SpaceBeforeRangeBasedForLoopColon: true
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles: false
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+TabWidth: 4
+
+UseTab: Never
+
+AccessModifierOffset: -2
+AlwaysBreakBeforeMultilineStrings: false
+DerivePointerAlignment: false
+
+IncludeBlocks: Preserve
+IndentPPDirectives: None
+
+PointerAlignment: Left
+
+SortIncludes: true

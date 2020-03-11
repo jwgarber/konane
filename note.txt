@@ -1,0 +1,6 @@
+When finding subgames, we first take connected components.
+We then take the BB of the component, and count the number of stones in the component.
+If the BB and size are below a certain level, then we have immediate bounds on the size.
+Else, we just use a heuristic (say 2).
+
+We then go through all the connected components, and merge them together if the distance between the parts is less than 4 (or perhaps less if the CCs are very small). Then rinse and repeat. Then that gives us the subgames, which we then solve independently. It might be nice to have a dictionary/lookup table for subgames, but that feels like a lot of work - skip for now.
