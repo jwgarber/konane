@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "konane.h"
+#include "main.h"
 #if 0
 
 // Max number of connected components is board size^2 / 2.

@@ -1,5 +1,5 @@
 #pragma once
 
-#include "konane.h"
+#include "main.h"
 
 void solve(const State board[SIZE][SIZE], const State color);

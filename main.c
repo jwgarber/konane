@@ -7,7 +7,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "konane.h"
+#include "main.h"
 #include "solve.h"
 #include "play.h"
 
