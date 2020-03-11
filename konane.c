@@ -310,7 +310,7 @@ int main(void){
         printBoard(board);
 
 	    // The computer then makes a second move
-	int32_t score = computer_move(&move, board, !user);
+	int32_t score = computer_move(&move, board, !user, DEPTH);
 
 	make_move(board, &move, !user);
 
@@ -334,7 +334,7 @@ int main(void){
             const int choice = user_move(&move, &depth);
             if (choice == 1) {
                 // hint
-                computer_move(&move, board, user);
+                computer_move(&move, board, user, depth);
                 print_move(&move);
                 printf("Use this hint? y/n\n");
             } else if (choice == 2) {
@@ -397,7 +397,7 @@ int main(void){
 	}
 
         // Computer move
-        int32_t score = computer_move(&move, board, !user);
+        int32_t score = computer_move(&move, board, !user, DEPTH);
 
 	make_move(board, &move, !user);
 

@@ -192,13 +192,14 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int
     return score;
 }
 
-int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State color) {
+int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State color, uint32_t depth) {
 
     State tmpboard[SIZE][SIZE];
 
     int32_t score = LOSE;
 
-    uint32_t depth = DEPTH;
+    // Ensure that we have depth at least one
+    if (depth == 0) depth = 1;
 
     int32_t a = LOSE, b = WIN;
 
