@@ -5,6 +5,8 @@
 # `make filename.o` creates the `filename` object file
 # `make clean` will rm all object files and the executable
 
+SIZE ?= 6
+
 TARGET = konane
 
 STD = -std=c11 -D_POSIX_C_SOURCE=200809L
@@ -17,17 +19,17 @@ CFLAGS = $(STD) $(WARNINGS) $(OPTS)
 
 SOURCES = $(wildcard *.c)
 HEADERS = $(wildcard *.h)
-OBJECTS = $(SOURCES:.c=.o)
+OBJECTS = $(SOURCES:.c=$(SIZE).o)
 
 # linking
-$(TARGET): $(OBJECTS)
+$(TARGET)$(SIZE): $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 
 # compiling
-%.o: %.c $(HEADERS)
-	$(CC) $(CFLAGS) -c $< -o $@
+%$(SIZE).o: %.c $(HEADERS)
+	$(CC) $(CFLAGS) -DSIZE=$(SIZE) -c $< -o $@
 
 .PHONY: clean
 
 clean:
-	-rm -f $(OBJECTS) $(TARGET)
+	-rm -f *.o $(TARGET)*

@@ -8,9 +8,6 @@ typedef enum {
     EMPTY = 2,
 } State;
 
-//#define SIZE  4
-#define SIZE  6
-
 // The number of possible moves a player can make is bounded above by the
 // number of opponent stones on the board, since each jump captures an opponent
 // stone. There are at most SIZE^2 stones on the board. However, if a player is
