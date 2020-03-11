@@ -336,6 +336,7 @@ int main(void){
                 // hint
                 computer_move(&move, board, user);
                 print_move(&move);
+                printf("Use this hint? y/n\n");
             } else if (choice == 2) {
 
                 const pid_t pid = fork();
