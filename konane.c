@@ -11,6 +11,15 @@
 #include "solve.h"
 #include "play.h"
 
+// TODO change the white/black names
+// solve from the command line, and optimize (eg. smaller moves, smaller boards)
+// be able to set the computer depth
+// set the size in the makefile, and have different sized boards
+//   this depends on being able to play from anywhere
+// print the moves when you solve
+// test everything and check it over!
+// write README
+
 #define WHITE_CIRCLE "○"
 #define BLACK_CIRCLE "●"
 
