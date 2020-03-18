@@ -306,6 +306,44 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
     else return -1;
 }
 
+static int solveMe(const State board[SIZE][SIZE], const State user){
+    struct sigaction action;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+
+
+    const pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+        solve(board, user);
+        return EXIT_SUCCESS;
+    } else {
+        // Ignore SIGINT for now
+        action.sa_handler = SIG_IGN;
+        if (sigaction(SIGINT, &action, NULL) == -1) {
+            perror("sigaction");
+            exit(EXIT_FAILURE);
+        }
+        // Wait for the child to terminate
+        int status;
+        if (wait(&status) == -1) {
+            perror("wait");
+            exit(EXIT_FAILURE);
+        }
+        if (!WIFEXITED(status)) {
+            puts(" cancelled");
+        }
+        // Now restore it again
+        action.sa_handler = SIG_DFL;
+        if (sigaction(SIGINT, &action, NULL) == -1) {
+            perror("sigaction");
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+
 int main(int argc, char *argv[]){
 
 	Move move = {};
@@ -323,7 +361,7 @@ int main(int argc, char *argv[]){
         case 1: break;
         case 2:
             if(strcmp(argv[1], "s") == 0 || strcmp(argv[1], "solve") == 0){
-                //solve
+                // solveMe
             }
             break;
         case 3:
@@ -333,7 +371,7 @@ int main(int argc, char *argv[]){
             break;
         case 4:
             if(strcmp(argv[1], "s") == 0 || strcmp(argv[1], "solve") == 0 || strcmp(argv[3], "s") == 0 || strcmp(argv[3], "solve") == 0){
-                //solve
+                // solveMe
             }
             if(strcmp(argv[1], "-d") == 0){
                 depth = (uint32_t) *argv[2];
@@ -425,42 +463,7 @@ int main(int argc, char *argv[]){
                     }
                 }
             } else if (choice == 2) {
-                // solve
-
-                const pid_t pid = fork();
-                if (pid == -1) {
-                    perror("fork");
-                    exit(EXIT_FAILURE);
-                } else if (pid == 0) {
-                    solve(board, user);
-                    return EXIT_SUCCESS;
-                } else {
-
-                    // Ignore SIGINT for now
-                    action.sa_handler = SIG_IGN;
-                    if (sigaction(SIGINT, &action, NULL) == -1) {
-                        perror("sigaction");
-                        exit(EXIT_FAILURE);
-                    }
-
-                    // Wait for the child to terminate
-                    int status;
-                    if (wait(&status) == -1) {
-                        perror("wait");
-                        exit(EXIT_FAILURE);
-                    }
-
-                    if (!WIFEXITED(status)) {
-                        puts(" cancelled");
-                    }
-
-                    // Now restore it again
-                    action.sa_handler = SIG_DFL;
-                    if (sigaction(SIGINT, &action, NULL) == -1) {
-                        perror("sigaction");
-                        exit(EXIT_FAILURE);
-                    }
-                }
+                solveMe(board, user);
 
             } else if (choice == 3) {
                 // quit
