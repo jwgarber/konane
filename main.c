@@ -11,18 +11,17 @@
 #include "solve.h"
 #include "play.h"
 
-// TODO change the white/black names
-// solve from the command line, and optimize (eg. smaller moves, smaller boards)
-//   benchmark, and use this to solve 5x5 and 6x6
-// be able to set the computer depth
+// TODO
+// optimize (eg. smaller moves, smaller boards)
+// benchmark, and use this to solve 5x5 and 6x6
 // set the size in the makefile, and have different sized boards
-//   this depends on being able to play from anywhere
+// this depends on being able to play from anywhere
 // print the moves when you solve
 // test everything and check it over!
 // write README
 
-#define WHITE_CIRCLE "○"
-#define BLACK_CIRCLE "●"
+#define BLACK_CIRCLE "○"
+#define WHITE_CIRCLE "●"
 
 static void initBoard(State board[SIZE][SIZE]){
 	for(int i = 0; i < SIZE; i++){
@@ -307,7 +306,7 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
     else return -1;
 }
 
-int main(void){
+int main(int argc, char *argv[]){
 
 	Move move = {};
 	State board[SIZE][SIZE];
@@ -318,6 +317,35 @@ int main(void){
 
 	initBoard(board);
 	printBoard(board);
+
+    uint32_t depth = DEPTH;
+    switch(argc){
+        case 1: break;
+        case 2:
+            if(strcmp(argv[1], "s") == 0 || strcmp(argv[1], "solve") == 0){
+                //solve
+            }
+            break;
+        case 3:
+            if(strcmp(argv[1], "-d") == 0){
+                depth = (uint32_t) *argv[2];
+            }
+            break;
+        case 4:
+            if(strcmp(argv[1], "s") == 0 || strcmp(argv[1], "solve") == 0 || strcmp(argv[3], "s") == 0 || strcmp(argv[3], "solve") == 0){
+                //solve
+            }
+            if(strcmp(argv[1], "-d") == 0){
+                depth = (uint32_t) *argv[2];
+            }
+            if(strcmp(argv[2], "-d") == 0){
+                depth = (uint32_t) *argv[3];
+            }
+            break;
+        default:
+            fprintf(stderr, "See README for acceptable commands");
+            exit(1);
+    }
 
     const State user = getUser();
 
@@ -330,8 +358,8 @@ int main(void){
         computer_black(board);
         printBoard(board);
 
-	    // The computer then makes a second move
-	int32_t score = computer_move(&move, board, !user, DEPTH);
+	// The computer then makes a second move
+	int32_t score = computer_move(&move, board, !user, depth);
 
 	make_move(board, &move, !user);
 
@@ -354,7 +382,6 @@ int main(void){
 	putchar('\n');
 
         while (true) {
-            uint32_t depth = DEPTH;
             const int choice = user_move(&move, &depth);
 
             if (choice == 1) {
