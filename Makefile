@@ -5,7 +5,8 @@
 # `make filename.o` creates the `filename` object file
 # `make clean` will rm all object files and the executable
 
-SIZE ?= 6
+X ?= 6
+Y ?= 6
 
 TARGET = konane
 
@@ -20,15 +21,15 @@ CFLAGS = $(STD) $(WARNINGS) $(OPTS) $(SAN)
 
 SOURCES = $(wildcard *.c)
 HEADERS = $(wildcard *.h)
-OBJECTS = $(SOURCES:.c=$(SIZE).o)
+OBJECTS = $(SOURCES:.c=$(X)x$(Y).o)
 
 # linking
-$(TARGET)$(SIZE): $(OBJECTS)
+$(TARGET)$(X)x$(Y): $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 
 # compiling
-%$(SIZE).o: %.c $(HEADERS)
-	$(CC) $(CFLAGS) -DSIZE=$(SIZE) -c $< -o $@
+%$(X)x$(Y).o: %.c $(HEADERS)
+	$(CC) $(CFLAGS) -DX=$(X) -DY=$(Y) -c $< -o $@
 
 .PHONY: clean
 

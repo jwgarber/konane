@@ -12,11 +12,12 @@ typedef struct {
 
 static void alloc_list(MovesList* list) {
 
-    // There can be at most SIZE^2 moves in a game, since there are SIZE^2
+    // There can be at most X*Y moves in a game, since there are X*Y
     // pieces in the beginning and each move removes a piece. (So in fact
-    // there are at most SIZE^2 - 1 moves, since there is always at least
+    // there are at most X*Y - 1 moves, since there is always at least
     // one piece left at the end.)
-    Move* ptr = malloc(SIZE * SIZE * sizeof(Move));
+    // TODO optimize this
+    Move* ptr = malloc(X * Y * sizeof(Move));
 
     if (ptr == NULL) {
         perror("malloc");
@@ -43,10 +44,10 @@ static void print_move(const Move* move, const State color) {
 
     switch (color) {
     case BLACK:
-        printf(" B %c%zu %c%zu\n", start_col, move->start_row, end_col, move->end_row);
+        printf(" B %c%i %c%i\n", start_col, move->start_row, end_col, move->end_row);
         break;
     case WHITE:
-        printf(" W %c%zu %c%zu\n", start_col, move->start_row, end_col, move->end_row);
+        printf(" W %c%i %c%i\n", start_col, move->start_row, end_col, move->end_row);
         break;
     default:
         printf("Invalid color %i in %s\n", color, __func__);
@@ -79,17 +80,17 @@ static void print_list(const MovesList* list, State color, int32_t score) {
 }
 
 // Count the number of moves for this player.
-static int32_t count_moves(const State board[SIZE][SIZE], const State color) {
+static int32_t count_moves(const State board[Y][X], const State color) {
 
     int32_t count = 0;
 
-    for (size_t i = 0; i < SIZE; ++i) {
-        for (size_t j = 0; j < SIZE; ++j) {
+    for (int32_t i = 0; i < Y; ++i) {
+        for (int32_t j = 0; j < X; ++j) {
 
             if (board[i][j] != color) continue;
 
             // Search up
-            for (size_t k = i; k >= 2; k -= 2) {
+            for (int32_t k = i; k >= 2; k -= 2) {
                 if (board[k - 1][j] == !color && board[k - 2][j] == EMPTY) {
                     ++count;
                 } else
@@ -97,7 +98,7 @@ static int32_t count_moves(const State board[SIZE][SIZE], const State color) {
             }
 
             // Search right
-            for (size_t k = j; k < SIZE - 2; k += 2) {
+            for (int32_t k = j; k < X - 2; k += 2) {
                 if (board[i][k + 1] == !color && board[i][k + 2] == EMPTY) {
                     ++count;
                 } else
@@ -105,7 +106,7 @@ static int32_t count_moves(const State board[SIZE][SIZE], const State color) {
             }
 
             // Search left
-            for (size_t k = j; k >= 2; k -= 2) {
+            for (int32_t k = j; k >= 2; k -= 2) {
                 if (board[i][k - 1] == !color && board[i][k - 2] == EMPTY) {
                     ++count;
                 } else
@@ -113,7 +114,7 @@ static int32_t count_moves(const State board[SIZE][SIZE], const State color) {
             }
 
             // Search down
-            for (size_t k = i; k < SIZE - 2; k += 2) {
+            for (int32_t k = i; k < Y - 2; k += 2) {
                 if (board[k + 1][j] == !color && board[k + 2][j] == EMPTY) {
                     ++count;
                 } else
@@ -131,23 +132,23 @@ static int32_t count_moves(const State board[SIZE][SIZE], const State color) {
 // possible moves is better than a choice the opponent can already pick,
 // they won't pick this move, so bail out early.
 
-static int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int32_t b, MovesList* list) {
+static int32_t negamax(const State board[Y][X], const State color, int32_t a, int32_t b, MovesList* list) {
 
     // Set the list to NULL at the beginning
     list->moves = NULL;
     int32_t score = LOSE;
 
     MovesList newlist;
-    State newboard[SIZE][SIZE];
+    State newboard[Y][X];
 
-    for (size_t i = 0; i < SIZE; ++i) {
-        for (size_t j = 0; j < SIZE; ++j) {
+    for (int32_t i = 0; i < Y; ++i) {
+        for (int32_t j = 0; j < X; ++j) {
 
             if (board[i][j] != color) continue;
 
             // Search up
             board_copy(newboard, board);
-            for (size_t k = i; k >= 2; k -= 2) {
+            for (int32_t k = i; k >= 2; k -= 2) {
                 if (board[k - 1][j] == !color && board[k - 2][j] == EMPTY) {
 
                     newboard[k][j] = EMPTY;
@@ -181,7 +182,7 @@ static int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t
 
             // Search right
             board_copy(newboard, board);
-            for (size_t k = j; k < SIZE - 2; k += 2) {
+            for (int32_t k = j; k < X - 2; k += 2) {
                 if (board[i][k + 1] == !color && board[i][k + 2] == EMPTY) {
 
                     newboard[i][k] = EMPTY;
@@ -214,7 +215,7 @@ static int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t
 
             // Search left
             board_copy(newboard, board);
-            for (size_t k = j; k >= 2; k -= 2) {
+            for (int32_t k = j; k >= 2; k -= 2) {
                 if (board[i][k - 1] == !color && board[i][k - 2] == EMPTY) {
 
                     newboard[i][k] = EMPTY;
@@ -247,7 +248,7 @@ static int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t
 
             // Search down
             board_copy(newboard, board);
-            for (size_t k = i; k < SIZE - 2; k += 2) {
+            for (int32_t k = i; k < Y - 2; k += 2) {
                 if (board[k + 1][j] == !color && board[k + 2][j] == EMPTY) {
 
                     newboard[k][j] = EMPTY;
@@ -291,7 +292,7 @@ static int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t
     return score;
 }
 
-void solve(const State board[SIZE][SIZE], const State color) {
+void solve(const State board[Y][X], const State color) {
 
     puts("Solving, type ^C to cancel");
 

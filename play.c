@@ -5,21 +5,21 @@
 
 // Winning is the best possible outcome, and losing is the worst possible.
 // It is impossible to be able to move to every single spot on a single turn,
-// so SIZE * SIZE will be greater than every possible score. Likewise,
-// - SIZE * SIZE will be less than any possible score, so we will use those
+// so X * Y will be greater than every possible score. Likewise,
+// - X * Y will be less than any possible score, so we will use those
 // as the values for winning and loosing.
-static void count_moves(const State board[SIZE][SIZE], int32_t* black, int32_t* white) {
+static void count_moves(const State board[Y][X], int32_t* black, int32_t* white) {
 
-    int8_t moveboard[2][SIZE][SIZE] = {};
+    int8_t moveboard[2][Y][X] = {};
 
-    for (size_t i = 0; i < SIZE; ++i) {
-        for (size_t j = 0; j < SIZE; ++j) {
+    for (int32_t i = 0; i < Y; ++i) {
+        for (int32_t j = 0; j < X; ++j) {
             const State color = board[i][j];
 
             if (color == EMPTY) continue;
 
             // Search up
-            for (size_t k = i; k >= 2; k -= 2) {
+            for (int32_t k = i; k >= 2; k -= 2) {
                 if (board[k - 1][j] == !color && board[k - 2][j] == EMPTY) {
                     moveboard[color][k - 2][j] = 1;
                 } else
@@ -27,7 +27,7 @@ static void count_moves(const State board[SIZE][SIZE], int32_t* black, int32_t* 
             }
 
             // Search right
-            for (size_t k = j; k < SIZE - 2; k += 2) {
+            for (int32_t k = j; k < X - 2; k += 2) {
                 if (board[i][k + 1] == !color && board[i][k + 2] == EMPTY) {
                     moveboard[color][i][k + 2] = 1;
                 } else
@@ -35,7 +35,7 @@ static void count_moves(const State board[SIZE][SIZE], int32_t* black, int32_t* 
             }
 
             // Search left
-            for (size_t k = j; k >= 2; k -= 2) {
+            for (int32_t k = j; k >= 2; k -= 2) {
                 if (board[i][k - 1] == !color && board[i][k - 2] == EMPTY) {
                     moveboard[color][i][k - 2] = 1;
                 } else
@@ -43,7 +43,7 @@ static void count_moves(const State board[SIZE][SIZE], int32_t* black, int32_t* 
             }
 
             // Search down
-            for (size_t k = i; k < SIZE - 2; k += 2) {
+            for (int32_t k = i; k < Y - 2; k += 2) {
                 if (board[k + 1][j] == !color && board[k + 2][j] == EMPTY) {
                     moveboard[color][k + 2][j] = 1;
                 } else
@@ -53,8 +53,8 @@ static void count_moves(const State board[SIZE][SIZE], int32_t* black, int32_t* 
     }
 
     int32_t sum[2] = {0, 0};
-    for (size_t i = 0; i < SIZE; ++i) {
-        for (size_t j = 0; j < SIZE; ++j) {
+    for (int32_t i = 0; i < Y; ++i) {
+        for (int32_t j = 0; j < X; ++j) {
             sum[BLACK] += moveboard[BLACK][i][j];
             sum[WHITE] += moveboard[WHITE][i][j];
         }
@@ -64,7 +64,7 @@ static void count_moves(const State board[SIZE][SIZE], int32_t* black, int32_t* 
     *white = sum[WHITE];
 }
 
-static int32_t evaluate_board(const State board[SIZE][SIZE], const State color) {
+static int32_t evaluate_board(const State board[Y][X], const State color) {
 
     int32_t black;
     int32_t white;
@@ -91,7 +91,7 @@ static int32_t evaluate_board(const State board[SIZE][SIZE], const State color) 
 }
 
 // color is the player who is currently making a move
-int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int32_t b, const uintmax_t depth) {
+int32_t negamax(const State board[Y][X], const State color, int32_t a, int32_t b, const uintmax_t depth) {
 
     if (depth == 0) {
         return evaluate_board(board, color);
@@ -99,18 +99,18 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int
 
     // If the depth is not zero, we then check all possible moves
     // This will also catch terminal nodes, because there will be no moves to make
-    State tmpboard[SIZE][SIZE];
+    State tmpboard[Y][X];
 
     int32_t score = LOSE;
 
-    for (size_t i = 0; i < SIZE; ++i) {
-        for (size_t j = 0; j < SIZE; ++j) {
+    for (int32_t i = 0; i < Y; ++i) {
+        for (int32_t j = 0; j < X; ++j) {
 
             if (board[i][j] != color) continue;
 
             // Search up
             board_copy(tmpboard, board);
-            for (size_t k = i; k >= 2; k -= 2) {
+            for (int32_t k = i; k >= 2; k -= 2) {
                 if (board[k - 1][j] == !color && board[k - 2][j] == EMPTY) {
 
                     tmpboard[k][j] = EMPTY;
@@ -132,7 +132,7 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int
 
             // Search right
             board_copy(tmpboard, board);
-            for (size_t k = j; k < SIZE - 2; k += 2) {
+            for (int32_t k = j; k < X - 2; k += 2) {
                 if (board[i][k + 1] == !color && board[i][k + 2] == EMPTY) {
 
                     tmpboard[i][k] = EMPTY;
@@ -154,7 +154,7 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int
 
             // Search left
             board_copy(tmpboard, board);
-            for (size_t k = j; k >= 2; k -= 2) {
+            for (int32_t k = j; k >= 2; k -= 2) {
                 if (board[i][k - 1] == !color && board[i][k - 2] == EMPTY) {
 
                     tmpboard[i][k] = EMPTY;
@@ -176,7 +176,7 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int
 
             // Search down
             board_copy(tmpboard, board);
-            for (size_t k = i; k < SIZE - 2; k += 2) {
+            for (int32_t k = i; k < Y - 2; k += 2) {
                 if (board[k + 1][j] == !color && board[k + 2][j] == EMPTY) {
 
                     tmpboard[k][j] = EMPTY;
@@ -201,23 +201,23 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int
     return score;
 }
 
-int32_t computer_move(Move* move, const State board[SIZE][SIZE], const State color, const uintmax_t depth) {
+int32_t computer_move(Move* move, const State board[Y][X], const State color, const uintmax_t depth) {
 
-    State tmpboard[SIZE][SIZE];
+    State tmpboard[Y][X];
 
     int32_t score = LOSE;
 
     int32_t a = LOSE;
     int32_t b = WIN;
 
-    for (size_t i = 0; i < SIZE; ++i) {
-        for (size_t j = 0; j < SIZE; ++j) {
+    for (int32_t i = 0; i < Y; ++i) {
+        for (int32_t j = 0; j < X; ++j) {
 
             if (board[i][j] != color) continue;
 
             // Search up
             board_copy(tmpboard, board);
-            for (size_t k = i; k >= 2; k -= 2) {
+            for (int32_t k = i; k >= 2; k -= 2) {
                 if (tmpboard[k - 1][j] == !color && tmpboard[k - 2][j] == EMPTY) {
 
                     tmpboard[k][j] = EMPTY;
@@ -247,7 +247,7 @@ int32_t computer_move(Move* move, const State board[SIZE][SIZE], const State col
 
             // Search right
             board_copy(tmpboard, board);
-            for (size_t k = j; k < SIZE - 2; k += 2) {
+            for (int32_t k = j; k < X - 2; k += 2) {
                 if (tmpboard[i][k + 1] == !color && tmpboard[i][k + 2] == EMPTY) {
 
                     tmpboard[i][k] = EMPTY;
@@ -276,7 +276,7 @@ int32_t computer_move(Move* move, const State board[SIZE][SIZE], const State col
 
             // Search left
             board_copy(tmpboard, board);
-            for (size_t k = j; k >= 2; k -= 2) {
+            for (int32_t k = j; k >= 2; k -= 2) {
                 if (tmpboard[i][k - 1] == !color && tmpboard[i][k - 2] == EMPTY) {
 
                     tmpboard[i][k] = EMPTY;
@@ -305,7 +305,7 @@ int32_t computer_move(Move* move, const State board[SIZE][SIZE], const State col
 
             // Search down
             board_copy(tmpboard, board);
-            for (size_t k = i; k < SIZE - 2; k += 2) {
+            for (int32_t k = i; k < Y - 2; k += 2) {
                 if (tmpboard[k + 1][j] == !color && tmpboard[k + 2][j] == EMPTY) {
 
                     tmpboard[k][j] = EMPTY;
@@ -338,9 +338,9 @@ int32_t computer_move(Move* move, const State board[SIZE][SIZE], const State col
 }
 
 // Here we are making turns for white
-int32_t second_turn_search(const State board[SIZE][SIZE], const size_t row, const size_t col, int32_t a, int32_t b, const uintmax_t depth) {
+int32_t second_turn_search(const State board[Y][X], const int32_t row, const int32_t col, int32_t a, int32_t b, const uintmax_t depth) {
 
-    State tmpboard[SIZE][SIZE];
+    State tmpboard[Y][X];
 
     int32_t score = LOSE;
 
@@ -359,7 +359,7 @@ int32_t second_turn_search(const State board[SIZE][SIZE], const size_t row, cons
     }
 
     // Move right
-    if (col < SIZE - 1) {
+    if (col < X - 1) {
         board_copy(tmpboard, board);
         tmpboard[row][col + 1] = EMPTY;
         int32_t val = -negamax(tmpboard, BLACK, -b, -a, depth - 1);
@@ -387,7 +387,7 @@ int32_t second_turn_search(const State board[SIZE][SIZE], const size_t row, cons
     }
 
     // Move down
-    if (row < SIZE - 1) {
+    if (row < Y - 1) {
         board_copy(tmpboard, board);
         tmpboard[row + 1][col] = EMPTY;
         int32_t val = -negamax(tmpboard, BLACK, -b, -a, depth - 1);

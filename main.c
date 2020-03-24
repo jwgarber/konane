@@ -48,9 +48,9 @@ static char* readline(FILE* stream) {
     return line;
 }
 
-static void initBoard(State board[SIZE][SIZE]) {
-    for (size_t i = 0; i < SIZE; i++) {
-        for (size_t j = 0; j < SIZE; j++) {
+static void initBoard(State board[Y][X]) {
+    for (int32_t i = 0; i < Y; i++) {
+        for (int32_t j = 0; j < X; j++) {
             if ((i + j) % 2 == 0) {
                 board[i][j] = BLACK;
             } else {
@@ -60,17 +60,17 @@ static void initBoard(State board[SIZE][SIZE]) {
     }
 }
 
-static void printBoard(const State board[SIZE][SIZE]) {
+static void printBoard(const State board[Y][X]) {
     system("clear");
     printf("\n  ");
-    for (int i = 'a'; i < 'a' + SIZE; i++) {
+    for (int i = 'a'; i < 'a' + X; i++) {
         printf(" %c", i);
     }
     printf("\n");
-    for (int i = 0; i < SIZE; i++) {
-        if (SIZE > 10 && i < 10) putchar(' ');
+    for (int i = 0; i < Y; i++) {
+        if (Y > 10 && i < 10) putchar(' ');
         printf(" %d", i);
-        for (int j = 0; j < SIZE; j++) {
+        for (int j = 0; j < X; j++) {
             switch (board[i][j]) {
             case BLACK:
                 printf(" %s", BLACK_CIRCLE);
@@ -199,10 +199,10 @@ static State getUser(void) {
 }
 
 // User goes first
-static void user_black(State board[SIZE][SIZE], const uintmax_t depth) {
+static void user_black(State board[Y][X], const uintmax_t depth) {
 
-    size_t row;
-    size_t col;
+    int32_t row;
+    int32_t col;
 
     while (true) {
         printf("Select a stone to remove: ");
@@ -210,11 +210,11 @@ static void user_black(State board[SIZE][SIZE], const uintmax_t depth) {
         char* line = readline(stdin);
 
         char char_col;
-        if (sscanf(line, "%c%zu", &char_col, &row) == 2) {
+        if (sscanf(line, "%c%i", &char_col, &row) == 2) {
 
-            if ('a' <= char_col && char_col < 'a' + SIZE && row < SIZE) {
+            if ('a' <= char_col && char_col < 'a' + X && row < Y) {
 
-                col = (size_t)(char_col - 'a');
+                col = (int32_t)(char_col - 'a');
 
                 if (board[row][col] == BLACK) {
                     board[row][col] = EMPTY;
@@ -231,21 +231,21 @@ static void user_black(State board[SIZE][SIZE], const uintmax_t depth) {
 
     // Now the computer investigates each of the (possibly four) moves to make.
     // If the board is a 1x1, then there are no moves to make, so the user wins.
-    if (SIZE == 1) {
+    if (X == 1 && Y == 1) {
         puts("\n You won!");
         exit(EXIT_SUCCESS);
     }
 
     /*system("sleep 1");*/
 
-    State tmpboard[SIZE][SIZE];
+    State tmpboard[Y][X];
 
     int32_t score = LOSE;
     int32_t a = LOSE;
     int32_t b = WIN;
 
-    size_t comp_row = 0;
-    size_t comp_col = 0;
+    int32_t comp_row = 0;
+    int32_t comp_col = 0;
 
     // Move up
     if (row != 0) {
@@ -266,7 +266,7 @@ static void user_black(State board[SIZE][SIZE], const uintmax_t depth) {
     }
 
     // Move right
-    if (col < SIZE - 1) {
+    if (col < X - 1) {
         board_copy(tmpboard, board);
         tmpboard[row][col + 1] = EMPTY;
         int32_t val = -negamax(tmpboard, BLACK, -b, -a, depth - 1);
@@ -302,7 +302,7 @@ static void user_black(State board[SIZE][SIZE], const uintmax_t depth) {
     }
 
     // Move down
-    if (row < SIZE - 1) {
+    if (row < Y - 1) {
         board_copy(tmpboard, board);
         tmpboard[row + 1][col] = EMPTY;
         int32_t val = -negamax(tmpboard, BLACK, -b, -a, depth - 1);
@@ -325,23 +325,23 @@ done:
 
     printBoard(board);
 
-    printf("\n Computer move = %c%zu\n", (char)(comp_col + 'a'), comp_row);
+    printf("\n Computer move = %c%i\n", (char)(comp_col + 'a'), comp_row);
     print_score(" Computer", score);
 }
 
-static void computer_black(State board[SIZE][SIZE], const uintmax_t depth) {
+static void computer_black(State board[Y][X], const uintmax_t depth) {
 
-    State tmpboard[SIZE][SIZE];
+    State tmpboard[Y][X];
 
     int32_t score = LOSE;
     int32_t a = LOSE;
     int32_t b = WIN;
 
-    size_t row = 0;
-    size_t col = 0;
+    int32_t row = 0;
+    int32_t col = 0;
 
-    for (size_t i = 0; i < SIZE; ++i) {
-        for (size_t j = 0; j < SIZE; ++j) {
+    for (int32_t i = 0; i < Y; ++i) {
+        for (int32_t j = 0; j < X; ++j) {
 
             if (board[i][j] != BLACK) continue;
 
@@ -369,18 +369,18 @@ done:
 
     printBoard(board);
 
-    printf("\n Computer move = %c%zu\n", (char)(col + 'a'), row);
+    printf("\n Computer move = %c%i\n", (char)(col + 'a'), row);
     print_score(" Computer", score);
 
     putchar('\n');
 
-    if (SIZE == 1) {
+    if (X == 1 && Y == 1) {
         puts(" Computer won!");
         exit(EXIT_SUCCESS);
     }
 
-    size_t user_row;
-    size_t user_col;
+    int32_t user_row;
+    int32_t user_col;
 
     while (true) {
         printf("Select a stone to remove: ");
@@ -388,11 +388,11 @@ done:
         char* line = readline(stdin);
 
         char char_col;
-        if (sscanf(line, "%c%zu", &char_col, &user_row) == 2) {
+        if (sscanf(line, "%c%i", &char_col, &user_row) == 2) {
 
-            if ('a' <= char_col && char_col < 'a' + SIZE && row < SIZE) {
+            if ('a' <= char_col && char_col < 'a' + X && row < Y) {
 
-                user_col = (size_t)(char_col - 'a');
+                user_col = (int32_t)(char_col - 'a');
 
                 if (board[user_row][user_col] == WHITE) {
                     board[user_row][user_col] = EMPTY;
@@ -408,15 +408,15 @@ done:
     printBoard(board);
 }
 
-static bool game_over(const State board[SIZE][SIZE], const State player) {
-    for (size_t i = 0; i < SIZE; ++i) {
-        for (size_t j = 0; j < SIZE; ++j) {
+static bool game_over(const State board[Y][X], const State player) {
+    for (int32_t i = 0; i < Y; ++i) {
+        for (int32_t j = 0; j < X; ++j) {
             const State color = board[i][j];
             if (color != player) continue;
             if (j >= 2 && board[i][j - 1] == !color && board[i][j - 2] == EMPTY) return false;
             if (i >= 2 && board[i - 1][j] == !color && board[i - 2][j] == EMPTY) return false;
-            if (j < SIZE - 2 && board[i][j + 1] == !color && board[i][j + 2] == EMPTY) return false;
-            if (i < SIZE - 2 && board[i + 1][j] == !color && board[i + 2][j] == EMPTY) return false;
+            if (j < X - 2 && board[i][j + 1] == !color && board[i][j + 2] == EMPTY) return false;
+            if (i < Y - 2 && board[i + 1][j] == !color && board[i + 2][j] == EMPTY) return false;
         }
     }
     return true;
@@ -429,7 +429,7 @@ static bool game_over(const State board[SIZE][SIZE], const State player) {
 // 4 for making a move
 static int user_move(Move* move, uintmax_t* hint_depth) {
 
-    size_t start_row, end_row;
+    int32_t start_row, end_row;
     char char_start_col, char_end_col;
 
     while (true) {
@@ -456,14 +456,14 @@ static int user_move(Move* move, uintmax_t* hint_depth) {
         } else if (strcmp(line, "quit\n") == 0 || strcmp(line, "q\n") == 0) {
             free(line);
             return 3;
-        } else if (sscanf(line, "%c%zu %c%zu", &char_start_col, &start_row, &char_end_col, &end_row) == 4) {
+        } else if (sscanf(line, "%c%i %c%i", &char_start_col, &start_row, &char_end_col, &end_row) == 4) {
 
-            if ('a' <= char_start_col && char_start_col < 'a' + SIZE &&
-                'a' <= char_end_col && char_end_col < 'a' + SIZE &&
-                start_row < SIZE && end_row < SIZE) {
+            if ('a' <= char_start_col && char_start_col < 'a' + X &&
+                'a' <= char_end_col && char_end_col < 'a' + X &&
+                start_row < Y && end_row < Y) {
 
-                size_t start_col = (size_t)(char_start_col - 'a');
-                size_t end_col = (size_t)(char_end_col - 'a');
+                int32_t start_col = (int32_t)(char_start_col - 'a');
+                int32_t end_col = (int32_t)(char_end_col - 'a');
 
                 move->start_row = start_row;
                 move->end_row = end_row;
@@ -482,35 +482,35 @@ static void print_move(const Move* move) {
     char start_col, end_col;
     start_col = 'a' + (char) move->start_col;
     end_col = 'a' + (char) move->end_col;
-    printf("%c%zu %c%zu\n", start_col, move->start_row, end_col, move->end_row);
+    printf("%c%i %c%i\n", start_col, move->start_row, end_col, move->end_row);
 }
 
-static int make_move(State board[SIZE][SIZE], const Move* move, const State color) {
+static int make_move(State board[Y][X], const Move* move, const State color) {
     // diagonal move
     if (move->start_row != move->end_row) {
         if (move->start_col != move->end_col) return -1;
     }
 
     // coordinate bounds check
-    if (0 > (int) move->start_row || SIZE <= (int) move->start_row ||
-        0 > (int) move->end_row || SIZE <= (int) move->end_row ||
-        0 > (int) move->start_col || SIZE <= (int) move->start_col ||
-        0 > (int) move->end_col || SIZE <= (int) move->end_col) {
+    if (0 > (int) move->start_row || Y <= (int) move->start_row ||
+        0 > (int) move->end_row || Y <= (int) move->end_row ||
+        0 > (int) move->start_col || X <= (int) move->start_col ||
+        0 > (int) move->end_col || X <= (int) move->end_col) {
         return -1;
     }
 
     if (board[move->start_row][move->start_col] == color) {
-        State tmpboard[SIZE][SIZE];
+        State tmpboard[Y][X];
         board_copy(tmpboard, board);
         // Verticle move
         if (move->end_col == move->start_col) {
             int jump = (int) move->end_row - (int) move->start_row;
 
-            if (abs(jump) < 2 || abs(jump) > SIZE) return -1;
+            if (abs(jump) < 2 || abs(jump) > Y) return -1;
             else {
                 if (jump < 0) {
                     // up move
-                    for (size_t i = move->start_row; i > move->end_row; i -= 2) {
+                    for (int32_t i = move->start_row; i > move->end_row; i -= 2) {
                         if (tmpboard[i - 1][move->start_col] != !color) return -1;
                         if (tmpboard[i - 2][move->start_col] != EMPTY) return -1;
                         else {
@@ -524,7 +524,7 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
                 }
                 if (jump > 0) {
                     // down move
-                    for (size_t i = move->start_row; i < move->end_row; i += 2) {
+                    for (int32_t i = move->start_row; i < move->end_row; i += 2) {
                         if (tmpboard[i + 1][move->start_col] != !color) return -1;
                         if (tmpboard[i + 2][move->start_col] != EMPTY) return -1;
                         else {
@@ -543,11 +543,11 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
         if (move->end_row == move->start_row) {
             int jump = (int) move->end_col - (int) move->start_col;
 
-            if (abs(jump) < 2 || abs(jump) > SIZE) return -1;
+            if (abs(jump) < 2 || abs(jump) > X) return -1;
             else {
                 if (jump < 0) {
                     // left move
-                    for (size_t i = move->start_col; i > move->end_col; i -= 2) {
+                    for (int32_t i = move->start_col; i > move->end_col; i -= 2) {
                         if (tmpboard[move->start_row][i - 1] != !color) return -1;
                         if (tmpboard[move->start_row][i - 2] != EMPTY) return -1;
                         else {
@@ -561,7 +561,7 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
                 }
                 if (jump > 0) {
                     // right move
-                    for (size_t i = move->start_col; i < move->end_col; i += 2) {
+                    for (int32_t i = move->start_col; i < move->end_col; i += 2) {
                         if (tmpboard[move->start_row][i + 1] != !color) return -1;
                         if (tmpboard[move->start_row][i + 2] != EMPTY) return -1;
                         else {
@@ -582,7 +582,7 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
 }
 
 #if 0
-static bool use_hint(State board[SIZE][SIZE], const Move* move, const State user) {
+static bool use_hint(State board[Y][X], const Move* move, const State user) {
 
     char* line = readline(stdin);
 
@@ -605,7 +605,7 @@ static bool use_hint(State board[SIZE][SIZE], const Move* move, const State user
 int main(int argc, char* argv[]) {
 
     Move move = {};
-    State board[SIZE][SIZE];
+    State board[Y][X];
 
     struct sigaction action;
     sigemptyset(&action.sa_mask);
