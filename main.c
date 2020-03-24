@@ -163,7 +163,7 @@ static int user_move(Move* move, uint32_t *depth) {
 	char char_start_col, char_end_col;
 
 	while (true) {
-		printf("Enter a command for hint, solve, quit (h / s / q) or make a move: ");
+		printf("Enter a command for hint or hint depth, solve, quit (h / h # / s / q) or make a move: ");
 
 		char* line = NULL;
 		size_t len = 0;
@@ -306,6 +306,29 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
     else return -1;
 }
 
+static bool use_hint(State board[SIZE][SIZE], const Move* move, const State user){
+
+    char* line = NULL;
+    size_t len = 0;
+    getline(&line, &len, stdin);
+
+    if(strcmp(line, "y\n") == 0 || strcmp(line, "yes\n") == 0){
+        make_move(board, move, user);
+        printBoard(board);
+        free(line);
+        return true;
+    }
+    else if(strcmp(line, "n\n") == 0 || strcmp(line, "no\n") == 0){
+        free(line);
+        return false;
+    }
+    else{
+        free(line);
+        puts("Invalid option, please try again.\n");
+        return false;
+    }
+}
+
 static int solveMe(const State board[SIZE][SIZE], const State user){
     struct sigaction action;
     sigemptyset(&action.sa_mask);
@@ -341,6 +364,7 @@ static int solveMe(const State board[SIZE][SIZE], const State user){
             perror("sigaction");
             exit(EXIT_FAILURE);
         }
+        else exit(EXIT_FAILURE);
     }
 }
 
@@ -361,7 +385,7 @@ int main(int argc, char *argv[]){
         case 1: break;
         case 2:
             if(strcmp(argv[1], "s") == 0 || strcmp(argv[1], "solve") == 0){
-                // solveMe
+                // solveMe ??
             }
             break;
         case 3:
@@ -433,7 +457,11 @@ int main(int argc, char *argv[]){
                     int32_t score = computer_move(&move, board, user, depth);
                     print_move(&move);
                     print_score("User", score);
-                    /*printf("Use this hint? y/n\n");*/
+                    printf("Use this hint? y/n: ");
+
+                    if (use_hint(board, &move, user)){
+                        return EXIT_SUCCESS;
+                    }
                     return EXIT_SUCCESS;
                 } else {
 
@@ -462,12 +490,13 @@ int main(int argc, char *argv[]){
                         exit(EXIT_FAILURE);
                     }
                 }
+
             } else if (choice == 2) {
                 solveMe(board, user);
 
             } else if (choice == 3) {
                 // quit
-                exit(EXIT_SUCCESS);
+                exit(EXIT_FAILURE);
             } else {
                 // move
 
@@ -482,7 +511,7 @@ int main(int argc, char *argv[]){
 
         printBoard(board);
 
-	/*system("sleep 1");*/
+	system("sleep 1");
 
 	if (game_over(board, !user)) {
 	    puts("You won!");
