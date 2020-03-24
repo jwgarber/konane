@@ -1,3 +1,6 @@
+#include <errno.h>
+#include <ctype.h>
+#include <inttypes.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -11,17 +14,39 @@
 #include "solve.h"
 #include "play.h"
 
+#define str(a) #a
+#define xstr(a) str(a)
+
 // TODO
 // optimize (eg. smaller moves, smaller boards)
 // benchmark, and use this to solve 5x5 and 6x6
 // set the size in the makefile, and have different sized boards
 // this depends on being able to play from anywhere
-// print the moves when you solve
 // test everything and check it over!
 // write README
 
 #define BLACK_CIRCLE "○"
 #define WHITE_CIRCLE "●"
+
+// Read a line of input from the given stream.
+// This returns a dynamically allocated string that contains the line of input.
+static char* readline(FILE* stream) {
+
+    char* line = NULL;
+    size_t len = 0;
+
+    errno = 0;
+    if (getline(&line, &len, stream) == -1) {
+        if (errno == 0) {
+            fputs("reading input returned EOF\n", stderr);
+        } else {
+            perror("getline");
+        }
+        exit(EXIT_FAILURE);
+    }
+
+    return line;
+}
 
 static void initBoard(State board[SIZE][SIZE]){
 	for(int i = 0; i < SIZE; i++){
@@ -72,14 +97,91 @@ static void print_score(const char* str, const int32_t score) {
     }
 }
 
+// Parse a uintmax_t integer with extra error handling
+//
+// The strtoumax function in the standard library is rather loose in the strings
+// it will parse into valid integers. This function tightens those corner cases up.
+//
+// @param str : string containing an integer to parse
+// @param errstr : pointer to a string where an error string (if any) is stored
+// @return : On success, returns the parsed uintmax_t integer and sets *errstr to NULL.
+//           On failure, 0 is returned, and *errstr points to an error string.
+static uintmax_t parse_umax(const char* str, const char** errstr) {
+
+    // The string cannot be empty
+    if (*str == '\0') {
+        *errstr = "empty string";
+        return 0;
+    }
+
+    // Must consist entirely of digits
+    for (size_t i = 0; str[i] != '\0'; ++i) {
+        if (!isdigit(str[i])) {
+            *errstr = "non-digit character(s)";
+            return 0;
+        }
+    }
+
+    errno = 0;
+    const uintmax_t result = strtoumax(str, NULL, 10);
+    if (errno != 0) {
+        // strtoumax will fail if the value is outside the range of a uintmax_t
+        *errstr = "out of range";
+        return 0;
+    }
+
+    // Success!
+    *errstr = NULL;
+    return result;
+}
+
+static uintmax_t get_depth(void) {
+
+    while (true) {
+        printf("How deep should the computer search on its turn? (integer, default = " xstr(DEPTH) "): ");
+
+        char* line = readline(stdin);
+        size_t len = strlen(line);
+
+        if (len == 0 || line[len - 1] != '\n') {
+            puts("Invalid depth, please try again.");
+            free(line);
+            continue;
+        }
+
+        if (len == 1) {
+            // empty string, so just return the default
+            free(line);
+            return DEPTH;
+        }
+
+        // Chop off the newline
+        line[len - 1] = 0;
+
+        const char* errstr = NULL;
+        const uintmax_t depth = parse_umax(line, &errstr);
+        if (errstr == NULL) {
+            free(line);
+            // The depth needs to be at least 1
+            if (depth == 0) {
+                puts("Depth cannot be 0.");
+                continue;
+            }
+            return depth;
+        }
+
+        /*fprintf(stdout, "error: unable to parse %s as unsigned integer: %s\n", line, errstr);*/
+        puts("Invalid depth, please try again.");
+        free(line);
+    }
+}
+
 static State getUser(void){
-    putchar('\n');
+
     while (true) {
 	printf("Do you want to play black or white? (b/w): ");
 
-	    char* line = NULL;
-	    size_t len = 0;
-	getline(&line, &len, stdin);
+    char* line = readline(stdin);
 
 	if(strcmp(line, "b\n") == 0) {
 		free(line);
@@ -99,9 +201,7 @@ static void user_black(State board[SIZE][SIZE]){
     while (true) {
 	printf("Do you want to remove from the middle or corner? (m/c): ");
 
-	char* line = NULL;
-	size_t len = 0;
-	getline(&line, &len, stdin);
+    char* line = readline(stdin);
 
 	if(strcmp(line, "m\n") == 0){
 	    board[-1 + SIZE/2][-1 + SIZE/2] = EMPTY;
@@ -158,7 +258,7 @@ static bool game_over(const State board[SIZE][SIZE], const State player){
 // 2 for solve
 // 3 for quit
 // 4 for making a move
-static int user_move(Move* move, uint32_t *depth) {
+static int user_move(Move* move, uintmax_t *hint_depth) {
 
 	size_t start_row, end_row;
 	char char_start_col, char_end_col;
@@ -166,13 +266,18 @@ static int user_move(Move* move, uint32_t *depth) {
 	while (true) {
 		printf("Enter a command for hint or hint depth, solve, quit (h / h # / s / q) or make a move: ");
 
-		char* line = NULL;
-		size_t len = 0;
-		getline(&line, &len, stdin);
+		char* line = readline(stdin);
 
-		if (sscanf(line, "hint %u\n", depth) == 1 || sscanf(line,"h %u\n", depth) == 1){
+        uintmax_t tmp_depth;
+
+		if (sscanf(line, "hint %ju\n", &tmp_depth) == 1 || sscanf(line,"h %ju\n", &tmp_depth) == 1){
             free(line);
-			return 1;
+            if (tmp_depth == 0) {
+                puts("Depth cannot be 0.");
+                continue;
+            }
+            *hint_depth = tmp_depth;
+            return 1;
         } else if (strcmp(line, "hint\n") == 0 || strcmp(line, "h\n") == 0) {
             free(line);
             return 1;
@@ -309,9 +414,7 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
 
 static bool use_hint(State board[SIZE][SIZE], const Move* move, const State user){
 
-    char* line = NULL;
-    size_t len = 0;
-    getline(&line, &len, stdin);
+    char* line = readline(stdin);
 
     if(strcmp(line, "y\n") == 0 || strcmp(line, "yes\n") == 0){
         make_move(board, move, user);
@@ -330,45 +433,6 @@ static bool use_hint(State board[SIZE][SIZE], const Move* move, const State user
     }
 }
 
-static int solveMe(const State board[SIZE][SIZE], const State user){
-    struct sigaction action;
-    sigemptyset(&action.sa_mask);
-    action.sa_flags = 0;
-
-
-    const pid_t pid = fork();
-    if (pid == -1) {
-        perror("fork");
-        exit(EXIT_FAILURE);
-    } else if (pid == 0) {
-        solve(board, user);
-        return EXIT_SUCCESS;
-    } else {
-        // Ignore SIGINT for now
-        action.sa_handler = SIG_IGN;
-        if (sigaction(SIGINT, &action, NULL) == -1) {
-            perror("sigaction");
-            exit(EXIT_FAILURE);
-        }
-        // Wait for the child to terminate
-        int status;
-        if (wait(&status) == -1) {
-            perror("wait");
-            exit(EXIT_FAILURE);
-        }
-        if (!WIFEXITED(status)) {
-            puts(" cancelled");
-        }
-        // Now restore it again
-        action.sa_handler = SIG_DFL;
-        if (sigaction(SIGINT, &action, NULL) == -1) {
-            perror("sigaction");
-            exit(EXIT_FAILURE);
-        }
-        else exit(EXIT_FAILURE);
-    }
-}
-
 int main(int argc, char *argv[]){
 
 	Move move = {};
@@ -381,7 +445,6 @@ int main(int argc, char *argv[]){
 	initBoard(board);
 	printBoard(board);
 
-    uint32_t depth = DEPTH;
     switch(argc){
         case 1: break;
         case 2:
@@ -389,28 +452,15 @@ int main(int argc, char *argv[]){
                 // solveMe ??
             }
             break;
-        case 3:
-            if(strcmp(argv[1], "-d") == 0){
-                depth = (uint32_t) *argv[2];
-            }
-            break;
-        case 4:
-            if(strcmp(argv[1], "s") == 0 || strcmp(argv[1], "solve") == 0 || strcmp(argv[3], "s") == 0 || strcmp(argv[3], "solve") == 0){
-                // solveMe
-            }
-            if(strcmp(argv[1], "-d") == 0){
-                depth = (uint32_t) *argv[2];
-            }
-            if(strcmp(argv[2], "-d") == 0){
-                depth = (uint32_t) *argv[3];
-            }
-            break;
         default:
             fprintf(stderr, "See README for acceptable commands");
             exit(1);
     }
 
+    putchar('\n');
     const State user = getUser();
+    uintmax_t depth = get_depth();
+    printf("depth = %ju", depth);
 
     if(user == BLACK){
         user_black(board);
@@ -445,7 +495,9 @@ int main(int argc, char *argv[]){
 	putchar('\n');
 
         while (true) {
-            const int choice = user_move(&move, &depth);
+
+            uintmax_t hint_depth = depth;
+            const int choice = user_move(&move, &hint_depth);
 
             if (choice == 1) {
                 // hint
@@ -455,15 +507,15 @@ int main(int argc, char *argv[]){
                     perror("fork");
                     exit(EXIT_FAILURE);
                 } else if (pid == 0) {
-                    int32_t score = computer_move(&move, board, user, depth);
+                    int32_t score = computer_move(&move, board, user, hint_depth);
                     print_move(&move);
                     print_score("User", score);
-                    printf("Use this hint? y/n: ");
+                    /*printf("Use this hint? y/n: ");*/
 
-                    if (use_hint(board, &move, user)){
-                        return EXIT_SUCCESS;
-                    }
-                    return EXIT_SUCCESS;
+                    /*if (use_hint(board, &move, user)){*/
+                        /*return EXIT_SUCCESS;*/
+                    /*}*/
+                    exit(EXIT_SUCCESS);
                 } else {
 
                     // Ignore SIGINT for now
@@ -493,11 +545,45 @@ int main(int argc, char *argv[]){
                 }
 
             } else if (choice == 2) {
-                solveMe(board, user);
+                // solve
+
+                const pid_t pid = fork();
+                if (pid == -1) {
+                    perror("fork");
+                    exit(EXIT_FAILURE);
+                } else if (pid == 0) {
+                    solve(board, user);
+                    exit(EXIT_SUCCESS);
+                } else {
+                    // Ignore SIGINT for now
+                    action.sa_handler = SIG_IGN;
+                    if (sigaction(SIGINT, &action, NULL) == -1) {
+                        perror("sigaction");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    // Wait for the child to terminate
+                    int status;
+                    if (wait(&status) == -1) {
+                        perror("wait");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    if (!WIFEXITED(status)) {
+                        puts(" cancelled");
+                    }
+
+                    // Now restore it again
+                    action.sa_handler = SIG_DFL;
+                    if (sigaction(SIGINT, &action, NULL) == -1) {
+                        perror("sigaction");
+                        exit(EXIT_FAILURE);
+                    }
+                }
 
             } else if (choice == 3) {
                 // quit
-                exit(EXIT_FAILURE);
+                exit(EXIT_SUCCESS);
             } else {
                 // move
 
@@ -506,7 +592,6 @@ int main(int argc, char *argv[]){
                 if (val == 1) break;
 
                 puts("Invalid move, please try again.");
-
             }
         }
 
@@ -520,7 +605,7 @@ int main(int argc, char *argv[]){
 	}
 
         // Computer move
-        int32_t score = computer_move(&move, board, !user, DEPTH);
+        int32_t score = computer_move(&move, board, !user, depth);
 
 	make_move(board, &move, !user);
 
