@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+_Static_assert(1 <= SIZE && SIZE <= 26, "Size not right");
+
 typedef enum {
     BLACK = 0,
     WHITE = 1,

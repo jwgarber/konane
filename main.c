@@ -21,9 +21,9 @@
 // optimize (eg. smaller moves, smaller boards)
 // benchmark, and use this to solve 5x5 and 6x6
 // set the size in the makefile, and have different sized boards
-// this depends on being able to play from anywhere
 // test everything and check it over!
 // write README
+// figure out sleep stuff too
 
 #define BLACK_CIRCLE "○"
 #define WHITE_CIRCLE "●"
@@ -141,7 +141,7 @@ static uintmax_t parse_umax(const char* str, const char** errstr) {
 static uintmax_t get_depth(void) {
 
     while (true) {
-        printf("How deep should the computer search on its turn? (integer, default = " xstr(DEPTH) "): ");
+        printf("How deep should the computer search on its turn? (default = " xstr(DEPTH) "): ");
 
         char* line = readline(stdin);
         size_t len = strlen(line);
@@ -200,47 +200,214 @@ static State getUser(void) {
     }
 }
 
-static void user_black(State board[SIZE][SIZE]) {
+// User goes first
+static void user_black(State board[SIZE][SIZE], const uintmax_t depth) {
+
+    size_t row;
+    size_t col;
+
     while (true) {
-        printf("Do you want to remove from the middle or corner? (m/c): ");
+        printf("Select a stone to remove: ");
 
         char* line = readline(stdin);
 
-        if (strcmp(line, "m\n") == 0) {
-            board[-1 + SIZE / 2][-1 + SIZE / 2] = EMPTY;
-            board[-1 + SIZE / 2][SIZE / 2] = EMPTY;
-            free(line);
-            return;
-        }
+        char char_col;
+        if (sscanf(line, "%c%zu", &char_col, &row) == 2) {
 
-        if (strcmp(line, "c\n") == 0) {
-            board[0][0] = EMPTY;
-            board[0][1] = EMPTY;
-            free(line);
-            return;
+            if ('a' <= char_col && char_col < 'a' + SIZE && row < SIZE) {
+
+                col = (size_t)(char_col - 'a');
+
+                if (board[row][col] == BLACK) {
+                    board[row][col] = EMPTY;
+                    free(line);
+                    break;
+                }
+            }
         }
         puts("Invalid option, please try again.");
         free(line);
     }
+
+    printBoard(board);
+
+    // Now the computer investigates each of the (possibly four) moves to make.
+    // If the board is a 1x1, then there are no moves to make, so the user wins.
+    if (SIZE == 1) {
+        puts("You won!");
+        exit(EXIT_SUCCESS);
+    }
+
+    system("sleep 1");
+
+    State tmpboard[SIZE][SIZE];
+
+    int32_t score = LOSE;
+    int32_t a = LOSE;
+    int32_t b = WIN;
+
+    size_t comp_row = 0;
+    size_t comp_col = 0;
+
+    // Move up
+    if (row != 0) {
+        board_copy(tmpboard, board);
+        tmpboard[row - 1][col] = EMPTY;
+        int32_t val = -negamax(tmpboard, BLACK, -b, -a, depth - 1);
+
+        if (val >= score) {
+            score = val;
+            comp_row = row - 1;
+            comp_col = col;
+        }
+
+        if (score > a)
+            a = score;
+        if (a >= b)
+            goto done;
+    }
+
+    // Move right
+    if (col < SIZE - 1) {
+        board_copy(tmpboard, board);
+        tmpboard[row][col + 1] = EMPTY;
+        int32_t val = -negamax(tmpboard, BLACK, -b, -a, depth - 1);
+
+        if (val >= score) {
+            score = val;
+            comp_row = row;
+            comp_col = col + 1;
+        }
+
+        if (score > a)
+            a = score;
+        if (a >= b)
+            goto done;
+    }
+
+    // Move left
+    if (col != 0) {
+        board_copy(tmpboard, board);
+        tmpboard[row][col - 1] = EMPTY;
+        int32_t val = -negamax(tmpboard, BLACK, -b, -a, depth - 1);
+
+        if (val >= score) {
+            score = val;
+            comp_row = row;
+            comp_col = col - 1;
+        }
+
+        if (score > a)
+            a = score;
+        if (a >= b)
+            goto done;
+    }
+
+    // Move down
+    if (row < SIZE - 1) {
+        board_copy(tmpboard, board);
+        tmpboard[row + 1][col] = EMPTY;
+        int32_t val = -negamax(tmpboard, BLACK, -b, -a, depth - 1);
+
+        if (val >= score) {
+            score = val;
+            comp_row = row + 1;
+            comp_col = col;
+        }
+
+        if (score > a)
+            a = score;
+        if (a >= b)
+            goto done;
+    }
+
+done:
+
+    board[comp_row][comp_col] = EMPTY;
+
+    printBoard(board);
+
+    printf("\n Computer move = %c%zu\n", (char)(comp_col + 'a'), comp_row);
+    print_score(" Computer", score);
 }
 
-static void computer_black(State board[SIZE][SIZE]) {
-    State corn_board[SIZE][SIZE], mid_board[SIZE][SIZE];
-    board_copy(corn_board, board);
-    board_copy(mid_board, board);
+static void computer_black(State board[SIZE][SIZE], const uintmax_t depth) {
 
-    corn_board[0][0] = EMPTY;
-    corn_board[0][1] = EMPTY;
+    State tmpboard[SIZE][SIZE];
 
-    mid_board[-1 + SIZE / 2][-1 + SIZE / 2] = EMPTY;
-    mid_board[-1 + SIZE / 2][SIZE / 2] = EMPTY;
+    int32_t score = LOSE;
+    int32_t a = LOSE;
+    int32_t b = WIN;
 
-    int32_t corn_score = negamax(corn_board, BLACK, LOSE, WIN, DEPTH);
-    int32_t mid_score = negamax(mid_board, BLACK, LOSE, WIN, DEPTH);
+    size_t row = 0;
+    size_t col = 0;
 
-    if (corn_score > mid_score) board_copy(board, corn_board);
-    else
-        board_copy(board, mid_board);
+    for (size_t i = 0; i < SIZE; ++i) {
+        for (size_t j = 0; j < SIZE; ++j) {
+
+            if (board[i][j] != BLACK) continue;
+
+            board_copy(tmpboard, board);
+            tmpboard[i][j] = EMPTY;
+
+            int32_t val = -second_turn_search(tmpboard, row, col, -b, -a, depth - 1);
+
+            if (val >= score) {
+                score = val;
+                row = i;
+                col = j;
+            }
+
+            if (score > a)
+                a = score;
+            if (a >= b)
+                goto done;
+        }
+    }
+
+done:
+
+    board[row][col] = EMPTY;
+
+    printBoard(board);
+
+    printf("\n Computer move = %c%zu\n", (char)(col + 'a'), row);
+    print_score(" Computer", score);
+
+    if (SIZE == 1) {
+        puts("Computer won!");
+        exit(EXIT_SUCCESS);
+    }
+
+    size_t user_row;
+    size_t user_col;
+
+    putchar('\n');
+
+    while (true) {
+        printf("Select a stone to remove: ");
+
+        char* line = readline(stdin);
+
+        char char_col;
+        if (sscanf(line, "%c%zu", &char_col, &user_row) == 2) {
+
+            if ('a' <= char_col && char_col < 'a' + SIZE && row < SIZE) {
+
+                user_col = (size_t)(char_col - 'a');
+
+                if (board[user_row][user_col] == WHITE) {
+                    board[user_row][user_col] = EMPTY;
+                    free(line);
+                    break;
+                }
+            }
+        }
+        puts("Invalid option, please try again.");
+        free(line);
+    }
+
+    printBoard(board);
 }
 
 static bool game_over(const State board[SIZE][SIZE], const State player) {
@@ -268,7 +435,7 @@ static int user_move(Move* move, uintmax_t* hint_depth) {
     char char_start_col, char_end_col;
 
     while (true) {
-        printf("Enter a command for hint or hint depth, solve, quit (h / h # / s / q) or make a move: ");
+        printf("Enter a command for (hint, solve, quit) or make a move: ");
 
         char* line = readline(stdin);
 
@@ -460,18 +627,18 @@ int main(int argc, char* argv[]) {
     }
 
     putchar('\n');
-    const State user = getUser();
     uintmax_t depth = get_depth();
-    printf("depth = %ju", depth);
+    const State user = getUser();
+    printf("depth = %ju\n", depth);
 
     if (user == BLACK) {
-        user_black(board);
-        printBoard(board);
+        user_black(board, depth);
     }
 
     if (user == WHITE) {
-        computer_black(board);
-        printBoard(board);
+        computer_black(board, depth);
+
+        system("sleep 1");
 
         // The computer then makes a second move
         int32_t score = computer_move(&move, board, !user, depth);
@@ -482,10 +649,10 @@ int main(int argc, char* argv[]) {
 
         printf("\n Computer move = ");
         print_move(&move);
-
         print_score(" Computer", score);
     }
 
+    // In this loop we assume the user goes first
     while (true) {
 
         // User move

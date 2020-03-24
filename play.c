@@ -90,6 +90,7 @@ static int32_t evaluate_board(const State board[SIZE][SIZE], const State color) 
     }
 }
 
+// color is the player who is currently making a move
 int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int32_t b, const uintmax_t depth) {
 
     if (depth == 0) {
@@ -206,7 +207,8 @@ int32_t computer_move(Move* move, const State board[SIZE][SIZE], const State col
 
     int32_t score = LOSE;
 
-    int32_t a = LOSE, b = WIN;
+    int32_t a = LOSE;
+    int32_t b = WIN;
 
     for (size_t i = 0; i < SIZE; ++i) {
         for (size_t j = 0; j < SIZE; ++j) {
@@ -334,3 +336,70 @@ int32_t computer_move(Move* move, const State board[SIZE][SIZE], const State col
 
     return score;
 }
+
+// Here we are making turns for white
+int32_t second_turn_search(const State board[SIZE][SIZE], const size_t row, const size_t col, int32_t a, int32_t b, const uintmax_t depth) {
+
+    State tmpboard[SIZE][SIZE];
+
+    int32_t score = LOSE;
+
+    // Move up
+    if (row != 0) {
+        board_copy(tmpboard, board);
+        tmpboard[row - 1][col] = EMPTY;
+        int32_t val = -negamax(tmpboard, BLACK, -b, -a, depth - 1);
+
+        if (val > score)
+            score = val;
+        if (score > a)
+            a = score;
+        if (a >= b)
+            return score;
+    }
+
+    // Move right
+    if (col < SIZE - 1) {
+        board_copy(tmpboard, board);
+        tmpboard[row][col + 1] = EMPTY;
+        int32_t val = -negamax(tmpboard, BLACK, -b, -a, depth - 1);
+
+        if (val > score)
+            score = val;
+        if (score > a)
+            a = score;
+        if (a >= b)
+            return score;
+    }
+
+    // Move left
+    if (col != 0) {
+        board_copy(tmpboard, board);
+        tmpboard[row][col - 1] = EMPTY;
+        int32_t val = -negamax(tmpboard, BLACK, -b, -a, depth - 1);
+
+        if (val > score)
+            score = val;
+        if (score > a)
+            a = score;
+        if (a >= b)
+            return score;
+    }
+
+    // Move down
+    if (row < SIZE - 1) {
+        board_copy(tmpboard, board);
+        tmpboard[row + 1][col] = EMPTY;
+        int32_t val = -negamax(tmpboard, BLACK, -b, -a, depth - 1);
+
+        if (val > score)
+            score = val;
+        if (score > a)
+            a = score;
+        if (a >= b)
+            return score;
+    }
+
+    return score;
+}
+
