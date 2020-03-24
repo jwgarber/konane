@@ -583,6 +583,7 @@ static int make_move(State board[SIZE][SIZE], const Move* move, const State colo
         return -1;
 }
 
+#if 0
 static bool use_hint(State board[SIZE][SIZE], const Move* move, const State user) {
 
     char* line = readline(stdin);
@@ -601,6 +602,7 @@ static bool use_hint(State board[SIZE][SIZE], const Move* move, const State user
         return false;
     }
 }
+#endif
 
 int main(int argc, char* argv[]) {
 
