@@ -13,10 +13,10 @@ typedef enum {
 // stone. There are at most SIZE^2 stones on the board. However, if a player is
 // to move, they must have at least one of their stones on the board, so the
 // maximum number of possible moves is strictly less than SIZE^2.
-#define WIN      (SIZE * SIZE)
-#define LOSE    (-SIZE * SIZE)
+#define WIN (SIZE * SIZE)
+#define LOSE (-SIZE * SIZE)
 
-#define DEPTH	6
+#define DEPTH 6
 
 typedef struct {
     size_t start_row;
@@ -26,6 +26,5 @@ typedef struct {
 } Move;
 
 static inline void board_copy(State dst[SIZE][SIZE], const State src[SIZE][SIZE]) {
-	memcpy(dst, src, SIZE * SIZE * sizeof(State));
+    memcpy(dst, src, SIZE * SIZE * sizeof(State));
 }
-

@@ -22,28 +22,32 @@ static void count_moves(const State board[SIZE][SIZE], int32_t* black, int32_t* 
             for (size_t k = i; k >= 2; k -= 2) {
                 if (board[k - 1][j] == !color && board[k - 2][j] == EMPTY) {
                     moveboard[color][k - 2][j] = 1;
-                } else break;
+                } else
+                    break;
             }
 
             // Search right
             for (size_t k = j; k < SIZE - 2; k += 2) {
                 if (board[i][k + 1] == !color && board[i][k + 2] == EMPTY) {
                     moveboard[color][i][k + 2] = 1;
-                } else break;
+                } else
+                    break;
             }
 
             // Search left
             for (size_t k = j; k >= 2; k -= 2) {
                 if (board[i][k - 1] == !color && board[i][k - 2] == EMPTY) {
                     moveboard[color][i][k - 2] = 1;
-                } else break;
+                } else
+                    break;
             }
 
             // Search down
             for (size_t k = i; k < SIZE - 2; k += 2) {
                 if (board[k + 1][j] == !color && board[k + 2][j] == EMPTY) {
                     moveboard[color][k + 2][j] = 1;
-                } else break;
+                } else
+                    break;
             }
         }
     }
@@ -121,7 +125,8 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int
                     if (a >= b)
                         return score;
 
-                } else break;
+                } else
+                    break;
             }
 
             // Search right
@@ -142,7 +147,8 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int
                     if (a >= b)
                         return score;
 
-                } else break;
+                } else
+                    break;
             }
 
             // Search left
@@ -163,7 +169,8 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int
                     if (a >= b)
                         return score;
 
-                } else break;
+                } else
+                    break;
             }
 
             // Search down
@@ -184,7 +191,8 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int
                     if (a >= b)
                         return score;
 
-                } else break;
+                } else
+                    break;
             }
         }
     }
@@ -192,7 +200,7 @@ int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t a, int
     return score;
 }
 
-int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State color, const uintmax_t depth) {
+int32_t computer_move(Move* move, const State board[SIZE][SIZE], const State color, const uintmax_t depth) {
 
     State tmpboard[SIZE][SIZE];
 
@@ -231,7 +239,8 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                     if (a >= b)
                         return score;
 
-                } else break;
+                } else
+                    break;
             }
 
             // Search right
@@ -259,7 +268,8 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                     if (a >= b)
                         return score;
 
-                } else break;
+                } else
+                    break;
             }
 
             // Search left
@@ -287,7 +297,8 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                     if (a >= b)
                         return score;
 
-                } else break;
+                } else
+                    break;
             }
 
             // Search down
@@ -315,7 +326,8 @@ int32_t computer_move(Move *move, const State board[SIZE][SIZE], const State col
                     if (a >= b)
                         return score;
 
-                } else break;
+                } else
+                    break;
             }
         }
     }

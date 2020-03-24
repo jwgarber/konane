@@ -6,7 +6,7 @@
 #include "solve.h"
 
 typedef struct {
-    Move* moves; // pointer to malloc'd array
+    Move* moves;  // pointer to malloc'd array
     int32_t size; // current length of the list
 } MovesList;
 
@@ -81,41 +81,45 @@ static void print_list(const MovesList* list, State color, int32_t score) {
 // Count the number of moves for this player.
 static int32_t count_moves(const State board[SIZE][SIZE], const State color) {
 
-	int32_t count = 0;
+    int32_t count = 0;
 
     for (size_t i = 0; i < SIZE; ++i) {
-	for (size_t j = 0; j < SIZE; ++j) {
+        for (size_t j = 0; j < SIZE; ++j) {
 
-	    if (board[i][j] != color) continue;
+            if (board[i][j] != color) continue;
 
-	    // Search up
-	    for (size_t k = i; k >= 2; k -= 2) {
-		if (board[k - 1][j] == !color && board[k - 2][j] == EMPTY) {
-			++count;
-		} else break;
-	    }
+            // Search up
+            for (size_t k = i; k >= 2; k -= 2) {
+                if (board[k - 1][j] == !color && board[k - 2][j] == EMPTY) {
+                    ++count;
+                } else
+                    break;
+            }
 
-	    // Search right
-	    for (size_t k = j; k < SIZE - 2; k += 2) {
-		if (board[i][k + 1] == !color && board[i][k + 2] == EMPTY) {
-			++count;
-		} else break;
-	    }
+            // Search right
+            for (size_t k = j; k < SIZE - 2; k += 2) {
+                if (board[i][k + 1] == !color && board[i][k + 2] == EMPTY) {
+                    ++count;
+                } else
+                    break;
+            }
 
-	    // Search left
-	    for (size_t k = j; k >= 2; k -= 2) {
-		if (board[i][k - 1] == !color && board[i][k - 2] == EMPTY) {
-			++count;
-		} else break;
-	    }
+            // Search left
+            for (size_t k = j; k >= 2; k -= 2) {
+                if (board[i][k - 1] == !color && board[i][k - 2] == EMPTY) {
+                    ++count;
+                } else
+                    break;
+            }
 
-	    // Search down
-	    for (size_t k = i; k < SIZE - 2; k += 2) {
-		if (board[k + 1][j] == !color && board[k + 2][j] == EMPTY) {
-			++count;
-		} else break;
-	    }
-	}
+            // Search down
+            for (size_t k = i; k < SIZE - 2; k += 2) {
+                if (board[k + 1][j] == !color && board[k + 2][j] == EMPTY) {
+                    ++count;
+                } else
+                    break;
+            }
+        }
     }
 
     return count;
@@ -168,10 +172,11 @@ static int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t
 
                     if (score > a)
                         a = score;
-                    if (a >=b)
+                    if (a >= b)
                         return score;
 
-                } else break;
+                } else
+                    break;
             }
 
             // Search right
@@ -201,9 +206,10 @@ static int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t
 
                     if (score > a)
                         a = score;
-                    if (a >=b)
+                    if (a >= b)
                         return score;
-                } else break;
+                } else
+                    break;
             }
 
             // Search left
@@ -233,9 +239,10 @@ static int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t
 
                     if (score > a)
                         a = score;
-                    if (a >=b)
+                    if (a >= b)
                         return score;
-                } else break;
+                } else
+                    break;
             }
 
             // Search down
@@ -265,17 +272,18 @@ static int32_t negamax(const State board[SIZE][SIZE], const State color, int32_t
 
                     if (score > a)
                         a = score;
-                    if (a >=b)
+                    if (a >= b)
                         return score;
-                } else break;
+                } else
+                    break;
             }
         }
     }
 
     if (score == LOSE) {
-	    // We cannot make any moves, so the other player has won.
-	    // Count how many moves they have left, and that is the final score.
-	    score = -count_moves(board, !color);
+        // We cannot make any moves, so the other player has won.
+        // Count how many moves they have left, and that is the final score.
+        score = -count_moves(board, !color);
         // Also create a new empty list
         alloc_list(list);
     }
