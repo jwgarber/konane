@@ -39,13 +39,14 @@ static void initBoard(State board[SIZE][SIZE]){
 
 static void printBoard(const State board[SIZE][SIZE]){
     system("clear");
-    printf("\n  ");
+    printf("\n   ");
     for(int i = 'a'; i < 'a' + SIZE; i++){
         printf(" %c", i);
     }
     printf("\n");
     for(int i = 0; i < SIZE; i++){
-		printf(" %d", i);
+		if (i < 10) printf(" ");
+        printf(" %d", i);
         for(int j = 0; j < SIZE; j++){
             switch(board[i][j]){
                 case BLACK:
