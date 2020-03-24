@@ -14,7 +14,7 @@ CC = clang
 WARNINGS = -Weverything -Wno-gnu-empty-initializer -Wno-disabled-macro-expansion -Wno-padded
 SAN = -fsanitize=integer,undefined,address,leak
 #WARNINGS = -Wall -Wextra -Wpedantic
-OPTS = -O3 -march=native -flto
+OPTS = -O3 -march=native -flto -g
 CFLAGS = $(STD) $(WARNINGS) $(OPTS) $(SAN)
 #LDLIBS = -lpthread
 

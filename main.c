@@ -49,14 +49,12 @@ static char* readline(FILE* stream) {
 }
 
 static void initBoard(State board[SIZE][SIZE]) {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j = j + 2) {
-            if (i % 2 == 0) {
+    for (size_t i = 0; i < SIZE; i++) {
+        for (size_t j = 0; j < SIZE; j++) {
+            if ((i + j) % 2 == 0) {
                 board[i][j] = BLACK;
-                board[i][j + 1] = WHITE;
             } else {
                 board[i][j] = WHITE;
-                board[i][j + 1] = BLACK;
             }
         }
     }
