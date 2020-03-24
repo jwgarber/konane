@@ -232,11 +232,11 @@ static void user_black(State board[SIZE][SIZE], const uintmax_t depth) {
     // Now the computer investigates each of the (possibly four) moves to make.
     // If the board is a 1x1, then there are no moves to make, so the user wins.
     if (SIZE == 1) {
-        puts("You won!");
+        puts("\n You won!");
         exit(EXIT_SUCCESS);
     }
 
-    system("sleep 1");
+    /*system("sleep 1");*/
 
     State tmpboard[SIZE][SIZE];
 
@@ -372,15 +372,15 @@ done:
     printf("\n Computer move = %c%zu\n", (char)(col + 'a'), row);
     print_score(" Computer", score);
 
+    putchar('\n');
+
     if (SIZE == 1) {
-        puts("Computer won!");
+        puts(" Computer won!");
         exit(EXIT_SUCCESS);
     }
 
     size_t user_row;
     size_t user_col;
-
-    putchar('\n');
 
     while (true) {
         printf("Select a stone to remove: ");
@@ -638,7 +638,12 @@ int main(int argc, char* argv[]) {
     if (user == WHITE) {
         computer_black(board, depth);
 
-        system("sleep 1");
+        /*system("sleep 1");*/
+
+        if (game_over(board, !user)) {
+            puts("\n You won!");
+            exit(EXIT_SUCCESS);
+        }
 
         // The computer then makes a second move
         int32_t score = computer_move(&move, board, !user, depth);
@@ -657,7 +662,7 @@ int main(int argc, char* argv[]) {
 
         // User move
         if (game_over(board, user)) {
-            puts("Computer won!");
+            puts("\n Computer won!");
             break;
         }
 
@@ -766,10 +771,10 @@ int main(int argc, char* argv[]) {
 
         printBoard(board);
 
-        system("sleep 1");
+        /*system("sleep 1");*/
 
         if (game_over(board, !user)) {
-            puts("You won!");
+            puts("\n You won!");
             break;
         }
 
