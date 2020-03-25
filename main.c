@@ -612,19 +612,28 @@ int main(int argc, char* argv[]) {
     action.sa_flags = 0;
 
     initBoard(board);
-    printBoard(board);
 
-    switch (argc) {
-    case 1: break;
-    case 2:
-        if (strcmp(argv[1], "s") == 0 || strcmp(argv[1], "solve") == 0) {
-            // solveMe ??
+    if (argc == 3) {
+        if (strcmp(argv[1], "solve") == 0 && strcmp(argv[2], "black") == 0) {
+            puts("Solving for black...");
+            solve_start(board, BLACK);
+            exit(EXIT_SUCCESS);
         }
-        break;
-    default:
-        fprintf(stderr, "See README for acceptable commands");
-        exit(1);
+
+        if (strcmp(argv[1], "solve") == 0 && strcmp(argv[2], "white") == 0) {
+            puts("Solving for white...");
+            solve_start(board, WHITE);
+            exit(EXIT_SUCCESS);
+        }
+
+        puts("Invalid arguments, see README for acceptable commands");
+        exit(EXIT_FAILURE);
+    } else if (argc != 1) {
+        puts("Invalid arguments, see README for acceptable commands");
+        exit(EXIT_FAILURE);
     }
+
+    printBoard(board);
 
     putchar('\n');
     uintmax_t depth = get_depth();

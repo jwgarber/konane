@@ -289,6 +289,195 @@ static int32_t negamax(const State board[Y][X], const State color, int32_t a, in
     return score;
 }
 
+static int32_t second_turn(const State board[Y][X], const Move* move, const State color, int32_t a, int32_t b, MovesList* list) {
+
+    list->moves = NULL;
+
+    MovesList newlist;
+    State newboard[Y][X];
+
+    int32_t score = LOSE - 1;
+
+    const int32_t row = move->start_row;
+    const int32_t col = move->start_col;
+
+    // Move up
+    if (row != 0) {
+        board_copy(newboard, board);
+        newboard[row - 1][col] = EMPTY;
+        int32_t val = -negamax(newboard, !color, -b, -a, &newlist);
+
+        if (val > score) {
+            score = val;
+
+            // Free the old list of moves, because this one is better
+            free_list(list);
+            *list = newlist;
+
+            Move newmove = {row - 1, col, row - 1, col};
+            add_move(list, &newmove);
+        } else {
+            // Otherwise we don't use this list, so just ignore it
+            free_list(&newlist);
+        }
+
+        if (score > a)
+            a = score;
+        if (a >= b)
+            return score;
+    }
+
+    // Move right
+    if (col < X - 1) {
+        board_copy(newboard, board);
+        newboard[row][col + 1] = EMPTY;
+        int32_t val = -negamax(newboard, !color, -b, -a, &newlist);
+
+        if (val > score) {
+            score = val;
+
+            // Free the old list of moves, because this one is better
+            free_list(list);
+            *list = newlist;
+
+            Move newmove = {row, col + 1, row, col + 1};
+            add_move(list, &newmove);
+        } else {
+            // Otherwise we don't use this list, so just ignore it
+            free_list(&newlist);
+        }
+
+        if (score > a)
+            a = score;
+        if (a >= b)
+            return score;
+    }
+
+    // Move left
+    if (col != 0) {
+        board_copy(newboard, board);
+        newboard[row][col - 1] = EMPTY;
+        int32_t val = -negamax(newboard, !color, -b, -a, &newlist);
+
+        if (val > score) {
+            score = val;
+
+            // Free the old list of moves, because this one is better
+            free_list(list);
+            *list = newlist;
+
+            Move newmove = {row, col - 1, row, col - 1};
+            add_move(list, &newmove);
+        } else {
+            // Otherwise we don't use this list, so just ignore it
+            free_list(&newlist);
+        }
+
+        if (score > a)
+            a = score;
+        if (a >= b)
+            return score;
+    }
+
+    // Move down
+    if (row < Y - 1) {
+        board_copy(newboard, board);
+        newboard[row + 1][col] = EMPTY;
+        int32_t val = -negamax(newboard, !color, -b, -a, &newlist);
+
+        if (val > score) {
+            score = val;
+
+            // Free the old list of moves, because this one is better
+            free_list(list);
+            *list = newlist;
+
+            Move newmove = {row + 1, col, row + 1, col};
+            add_move(list, &newmove);
+        } else {
+            // Otherwise we don't use this list, so just ignore it
+            free_list(&newlist);
+        }
+
+        if (score > a)
+            a = score;
+        if (a >= b)
+            return score;
+    }
+
+    if (score == LOSE - 1) {
+        // In this case we have a 1x1 board, and we have lost
+        score = -1;
+        // Also create a new empty list
+        alloc_list(list);
+    }
+
+    return score;
+}
+
+static int32_t first_turn(const State board[Y][X], const State color, MovesList* list) {
+
+    list->moves = NULL;
+
+    MovesList newlist;
+    State newboard[Y][X];
+
+    int32_t score = LOSE - 1;
+    int32_t a = LOSE - 1;
+    int32_t b = WIN + 1;
+
+    for (int32_t i = 0; i < Y; ++i) {
+        for (int32_t j = 0; j < X; ++j) {
+
+            if (board[i][j] != color) continue;
+
+            board_copy(newboard, board);
+            newboard[i][j] = EMPTY;
+
+            Move newmove = {i, j, i, j};
+
+            int32_t val = -second_turn(newboard, &newmove, !color, -b, -a, &newlist);
+
+            if (val > score) {
+                score = val;
+
+                // Free the old list of moves, because this one is better
+                free_list(list);
+                *list = newlist;
+
+                add_move(list, &newmove);
+            } else {
+                // Otherwise we don't use this list, so just ignore it
+                free_list(&newlist);
+            }
+
+            if (score > a)
+                a = score;
+            if (a >= b)
+                return score;
+        }
+    }
+
+    if (score == LOSE - 1) {
+        // In this case we are playing white on a 1x1 board, and we have lost
+        score = -1;
+        // Also create a new empty list
+        alloc_list(list);
+    }
+
+    return score;
+}
+
+void solve_start(const State board[Y][X], const State color) {
+
+    MovesList list;
+    const int32_t score = first_turn(board, color, &list);
+
+    print_list(&list, color, score);
+
+    free_list(&list);
+}
+
 void solve(const State board[Y][X], const State color) {
 
     puts("Solving, type ^C to cancel");
