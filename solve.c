@@ -13,10 +13,7 @@ typedef struct {
 static void alloc_list(MovesList* list) {
 
     // There can be at most X*Y moves in a game, since there are X*Y
-    // pieces in the beginning and each move removes a piece. (So in fact
-    // there are at most X*Y - 1 moves, since there is always at least
-    // one piece left at the end.)
-    // TODO optimize this
+    // pieces in the beginning and each move removes a piece.
     Move* ptr = malloc(X * Y * sizeof(Move));
 
     if (ptr == NULL) {
@@ -68,10 +65,10 @@ static void print_list(const MovesList* list, State color, int32_t score) {
 
     switch (color) {
     case BLACK:
-        printf(" W wins by %i\n", score);
+        printf(" W wins by %i\n", score - 1);
         break;
     case WHITE:
-        printf(" B wins by %i\n", score);
+        printf(" B wins by %i\n", score - 1);
         break;
     default:
         printf("Invalid color %i in %s\n", color, __func__);
@@ -136,7 +133,7 @@ static int32_t negamax(const State board[Y][X], const State color, int32_t a, in
 
     // Set the list to NULL at the beginning
     list->moves = NULL;
-    int32_t score = LOSE;
+    int32_t score = LOSE - 1;
 
     MovesList newlist;
     State newboard[Y][X];
@@ -281,10 +278,10 @@ static int32_t negamax(const State board[Y][X], const State color, int32_t a, in
         }
     }
 
-    if (score == LOSE) {
+    if (score == LOSE - 1) {
         // We cannot make any moves, so the other player has won.
         // Count how many moves they have left, and that is the final score.
-        score = -count_moves(board, !color);
+        score = -count_moves(board, !color) - 1;
         // Also create a new empty list
         alloc_list(list);
     }
@@ -297,7 +294,7 @@ void solve(const State board[Y][X], const State color) {
     puts("Solving, type ^C to cancel");
 
     MovesList list;
-    const int32_t score = negamax(board, color, LOSE, WIN, &list);
+    const int32_t score = negamax(board, color, LOSE - 1, WIN + 1, &list);
 
     print_list(&list, color, score);
 

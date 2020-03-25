@@ -629,7 +629,6 @@ int main(int argc, char* argv[]) {
     putchar('\n');
     uintmax_t depth = get_depth();
     const State user = getUser();
-    printf("depth = %ju\n", depth);
 
     if (user == BLACK) {
         user_black(board, depth);
