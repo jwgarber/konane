@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "play.h"
@@ -85,7 +86,8 @@ static int32_t evaluate_board(const State board[Y][X], const State color) {
         return black - white;
     case WHITE:
         return white - black;
-    case EMPTY:
+    default:
+        printf("Invalid color %i in %s\n", color, __func__);
         exit(EXIT_FAILURE);
     }
 }

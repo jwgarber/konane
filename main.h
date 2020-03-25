@@ -5,11 +5,11 @@
 _Static_assert(1 <= X && X <= 26, "X must be between 1 and 26 (inclusive)");
 _Static_assert(1 <= Y && Y <= 26, "Y must be between 1 and 26 (inclusive)");
 
-typedef enum {
-    BLACK = 0,
-    WHITE = 1,
-    EMPTY = 2,
-} State;
+typedef uint8_t State;
+
+#define BLACK 0
+#define WHITE 1
+#define EMPTY 2
 
 // The number of possible moves a player can make is bounded above by the
 // number of opponent stones on the board, since each jump captures an opponent
