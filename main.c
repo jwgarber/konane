@@ -17,10 +17,7 @@
 #define str(a) #a
 #define xstr(a) str(a)
 
-// TODO
-// optimize (eg. smaller moves, smaller boards)
 // benchmark, and use this to solve 5x5 and 6x6
-// set the size in the makefile, and have different sized boards
 // test everything and check it over!
 // write README
 // figure out sleep stuff too
@@ -236,7 +233,7 @@ static void user_black(State board[Y][X], const uintmax_t depth) {
         exit(EXIT_SUCCESS);
     }
 
-    /*system("sleep 1");*/
+    system("sleep 1");
 
     State tmpboard[Y][X];
 
@@ -646,7 +643,7 @@ int main(int argc, char* argv[]) {
     if (user == WHITE) {
         computer_black(board, depth);
 
-        /*system("sleep 1");*/
+        system("sleep 1");
 
         if (game_over(board, !user)) {
             puts("\n You won!");
@@ -779,7 +776,7 @@ int main(int argc, char* argv[]) {
 
         printBoard(board);
 
-        /*system("sleep 1");*/
+        system("sleep 1");
 
         if (game_over(board, !user)) {
             puts("\n You won!");
