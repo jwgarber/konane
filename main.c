@@ -613,12 +613,14 @@ int main(int argc, char* argv[]) {
     if (argc == 3) {
         if (strcmp(argv[1], "solve") == 0 && strcmp(argv[2], "black") == 0) {
             puts("Solving for black...");
+            fflush(stdout);
             solve_start(board, BLACK);
             exit(EXIT_SUCCESS);
         }
 
         if (strcmp(argv[1], "solve") == 0 && strcmp(argv[2], "white") == 0) {
             puts("Solving for white...");
+            fflush(stdout);
             solve_start(board, WHITE);
             exit(EXIT_SUCCESS);
         }
