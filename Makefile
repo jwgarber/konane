@@ -15,7 +15,7 @@ STD = -std=c11 -D_POSIX_C_SOURCE=200809L
 #WARNINGS = -Weverything -Wno-gnu-empty-initializer -Wno-disabled-macro-expansion -Wno-padded
 #WARNINGS = -Wall -Wextra -Wpedantic
 #SAN = -fsanitize=integer,undefined,address -g
-OPTS = -O3 -march=native -flto -fopenmp
+OPTS = -O3 -march=native -flto
 CFLAGS = $(STD) $(WARNINGS) $(OPTS) $(SAN)
 #LDLIBS = -lpthread
 

@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <omp.h>
-
 #include "solve.h"
 
 typedef struct {
@@ -417,56 +415,29 @@ static int32_t second_turn(const State board[Y][X], const Move* move, const Stat
     return score;
 }
 
-static void print_status(const int32_t i, const int32_t j, const int32_t val, const State color) {
-
-    printf("Finished position (%i, %i), ", i, j);
-
-    if (color == BLACK && val < 0) {
-        printf("W wins by %i\n", -val - 1);
-    } else if (color == BLACK && val > 0) {
-        printf("B wins by %i\n", val - 1);
-    } else if (color == WHITE && val < 0) {
-        printf("B wins by %i\n", -val - 1);
-    } else if (color == WHITE && val > 0) {
-        printf("W wins by %i\n", val - 1);
-    } else {
-        puts("Unknown case in print_status");
-    }
-
-    fflush(stdout);
-}
-
 static int32_t first_turn(const State board[Y][X], const State color, MovesList* list) {
 
     list->moves = NULL;
 
-    // In this case, score and alpha are both initialized to the lowest possible value,
-    // and they will remain the same throughout the execution, so we can use score
-    // instead of alpha
-    int32_t score = LOSE - 1;
+    MovesList newlist;
+    State newboard[Y][X];
 
-    #pragma omp parallel for collapse(2)
+    int32_t score = LOSE - 1;
+    int32_t a = LOSE - 1;
+    int32_t b = WIN + 1;
+
     for (int32_t i = 0; i < Y; ++i) {
         for (int32_t j = 0; j < X; ++j) {
 
             if (board[i][j] != color) continue;
 
-            const int32_t b = WIN + 1;
-
-            MovesList newlist;
-            State newboard[Y][X];
-
             board_copy(newboard, board);
             newboard[i][j] = EMPTY;
 
-            const Move newmove = {i, j, i, j};
+            Move newmove = {i, j, i, j};
 
-            const int32_t val = -second_turn(newboard, &newmove, !color, -b, -score, &newlist);
+            int32_t val = -second_turn(newboard, &newmove, !color, -b, -a, &newlist);
 
-            #pragma omp critical
-            // In theory, we could save all the lists and scores, and then find the max
-            // once everything is done (and then just use atomic for the score)
-            {
             if (val > score) {
                 score = val;
 
@@ -480,11 +451,10 @@ static int32_t first_turn(const State board[Y][X], const State color, MovesList*
                 free_list(&newlist);
             }
 
-            // Normally here we return early if a >= b. However, b is never
-            // updated, and its initial value is higher than any possible score,
-            // so this will never happen.
-            print_status(i, j, val, color);
-            }
+            if (score > a)
+                a = score;
+            if (a >= b)
+                return score;
         }
     }
 
