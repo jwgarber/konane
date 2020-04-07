@@ -60,9 +60,14 @@ static void initBoard(State board[Y][X]) {
 static void printBoard(const State board[Y][X]) {
     system("clear");
     printf("\n  ");
+    if (Y > 10) {
+        putchar(' ');
+    }
+
     for (int32_t i = 'a'; i < 'a' + X; i++) {
         printf(" %c", i);
     }
+
     printf("\n");
     for (int32_t i = 0; i < Y; i++) {
         if (Y > 10 && i < 10) putchar(' ');
